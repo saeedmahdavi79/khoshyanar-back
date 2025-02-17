@@ -1,5 +1,6 @@
 const { UserModel } = require("../../../models/auth/auth.model");
 const { CustomersModel } = require("../../../models/customers/customers.model");
+const { ChatModel } = require("../../../models/messenger/chat.model");
 const { NotifModel } = require("../../../models/notfication/notfication.model");
 const {
   FYModel,
@@ -167,7 +168,6 @@ class UserController extends Controller {
     try {
       const { email, password } = req.body;
 
-      
       const hashedPassword = await sha256pass(password);
       const user = await UserModel.findOne({ email, password: hashedPassword });
       const userPersonel = await UserPersonelModel.findOne({
@@ -179,7 +179,6 @@ class UserController extends Controller {
         userName: email,
         password: password,
       });
-
 
       // if (!user || !userPersonel || !userCustomer) {
       //   return res.status(404).json({
@@ -197,34 +196,28 @@ class UserController extends Controller {
       //   });
       // }
 
-
-      const fetchToken = await fetch(baseUrl("/TokenAuth/Authenticate"),{
+      const fetchToken = await fetch(baseUrl("/TokenAuth/Authenticate"), {
         method: "POST",
-        
-        headers: {"Content-Type": "application/json-patch+json" ,"Abp.TenantId" :"1"},
+
+        headers: {
+          "Content-Type": "application/json-patch+json",
+          "Abp.TenantId": "1",
+        },
         body: JSON.stringify({
-          "userNameOrEmailAddress": "admin",
-          "password": "123qwe",
-          "twoFactorVerificationCode": "string",
-          "rememberClient": true,
-          "twoFactorRememberClientToken": "string",
-          "singleSignIn": true,
-          "returnUrl": "string",
-          "captchaResponse": "string"
-        })
-      })
+          userNameOrEmailAddress: "admin",
+          password: "123qwe",
+          twoFactorVerificationCode: "string",
+          rememberClient: true,
+          twoFactorRememberClientToken: "string",
+          singleSignIn: true,
+          returnUrl: "string",
+          captchaResponse: "string",
+        }),
+      });
 
       const getResponse = await fetchToken.json();
-      
-
-     
-      
 
       if (user) {
-
-
-
-
         const accessToken = await SignAccessToken(user._id);
         const refreshToken = await SignRefreshToken(user._id);
 
@@ -251,7 +244,7 @@ class UserController extends Controller {
           requestDate: new Date().toLocaleDateString("fa-ir"),
         });
       }
-      if(userCustomer){
+      if (userCustomer) {
         const accessToken = await SignAccessTokenCustomer(userCustomer._id);
         const refreshToken = await SignAccessTokenCustomer(userCustomer._id);
 
@@ -290,7 +283,7 @@ class UserController extends Controller {
         if (dataCompare.signCode == signCode) {
           return res.status(200).json({
             status: 200,
-
+            thatsOp: false,
             message: "صاحب امضا و کد احراز شد",
             requestDate: new Date().toLocaleDateString("fa-ir"),
           });
@@ -305,37 +298,63 @@ class UserController extends Controller {
       }
 
       if (userPersonel) {
-      if(userPersonel.access == "1"){
-        const dataCompare = await UserModel.findOne({
-          _id: userPersonel.adminUser,
-        });
-
-        if (dataCompare.signCode == signCode) {
-          return res.status(200).json({
-            status: 200,
-
-            message: "صاحب امضا و کد احراز شد",
-            requestDate: new Date().toLocaleDateString("fa-ir"),
+        if (userPersonel.access == "1") {
+          const dataCompare = await UserModel.findOne({
+            _id: userPersonel.adminUser,
           });
+
+          if (dataCompare.signCode == signCode) {
+            return res.status(200).json({
+              status: 200,
+              thatsOp: false,
+              message: "صاحب امضا و کد احراز شد",
+              requestDate: new Date().toLocaleDateString("fa-ir"),
+            });
+          } else {
+            return res.status(404).json({
+              status: 404,
+
+              message: "صاحب امضا و کد احراز نشد",
+              requestDate: new Date().toLocaleDateString("fa-ir"),
+            });
+          }
         } else {
-          return res.status(404).json({
-            status: 404,
+          // const dataCompare = await UserPersonelModel.findOne({
+          //   _id: userPersonel._id,
+          // });
 
-            message: "صاحب امضا و کد احراز نشد",
-            requestDate: new Date().toLocaleDateString("fa-ir"),
-          });
+          if (userPersonel.signStatus == "1") {
+            if (userPersonel.signCode == signCode) {
+              return res.status(200).json({
+                status: 200,
+                thatsOp: true,
+                message: "صاحب امضا و کد احراز شد",
+                requestDate: new Date().toLocaleDateString("fa-ir"),
+              });
+            } else {
+              return res.status(404).json({
+                status: 404,
+
+                message: "صاحب امضا و کد احراز نشد",
+                requestDate: new Date().toLocaleDateString("fa-ir"),
+              });
+            }
+          } else {
+            return res.status(404).json({
+              status: 404,
+
+              message: "صاحب امضا و کد احراز نشد",
+              requestDate: new Date().toLocaleDateString("fa-ir"),
+            });
+          }
+
+          // return res.status(404).json({
+          //   status: 404,
+
+          //   message: "صاحب امضا و کد احراز نشد",
+          //   requestDate: new Date().toLocaleDateString("fa-ir"),
+          // });
         }
-      }else{
-       
-          return res.status(404).json({
-            status: 404,
-
-            message: "صاحب امضا و کد احراز نشد",
-            requestDate: new Date().toLocaleDateString("fa-ir"),
-          });
-       
-      }
-       
       }
     } catch (error) {
       next(error);
@@ -382,7 +401,7 @@ class UserController extends Controller {
       const userPersonel = await UserPersonelModel.findOne({
         phone: verifyResult.phone,
       });
-      
+
       const userCustomer = await CustomersModel.findOne({
         _id: verifyResult.userID,
       });
@@ -470,14 +489,14 @@ class UserController extends Controller {
                 message: "اطلاعات کاربر دریافت شد",
                 requestDate: new Date().toLocaleDateString("fa-ir"),
               });
-            } else if(userCustomer){
+            } else if (userCustomer) {
               res.status(200).json({
                 status: 200,
                 user: userCustomer,
                 message: "اطلاعات کاربر دریافت شد",
                 requestDate: new Date().toLocaleDateString("fa-ir"),
               });
-            }else {
+            } else {
               res.status(401).json({
                 status: 401,
                 message: "کاربر احراز هویت نشده است",
@@ -729,6 +748,156 @@ class UserController extends Controller {
     } catch (error) {
       next(error);
     }
+  }
+
+  async createChat(req, res, next) {
+    try {
+      //const { message } = req.body;
+
+      // const authorization = req.headers.authorization;
+      // const [bearer, token] = authorization.split(" ");
+
+      // const verifyResult = await verifyAccessToken(token);
+      // const userPersonel = await UserPersonelModel.findOne({
+      //   phone: verifyResult.phone,
+      // });
+      // const user = await UserModel.findOne({
+      //   phone: verifyResult.phone,
+      // });
+
+      // if (user) {
+      //   const createMessage = await ChatModel.create({
+      //     text,
+      //     sender: user._id,
+      //     deliver,
+      //     date:
+      //       shamsi.gregorianToJalali(new Date())[0] +
+      //       "/" +
+      //       shamsi.gregorianToJalali(new Date())[1] +
+      //       "/" +
+      //       shamsi.gregorianToJalali(new Date())[2],
+      //     month: shamsi.gregorianToJalali(new Date())[1],
+      //     year: shamsi.gregorianToJalali(new Date())[0],
+      //     day: shamsi.gregorianToJalali(new Date())[2],
+      //   });
+      // }
+      // if (userPersonel) {
+      //   const createMessage = await ChatModel.create({
+      //     text,
+      //     sender: userPersonel._id,
+      //     deliver,
+      //     date:
+      //       shamsi.gregorianToJalali(new Date())[0] +
+      //       "/" +
+      //       shamsi.gregorianToJalali(new Date())[1] +
+      //       "/" +
+      //       shamsi.gregorianToJalali(new Date())[2],
+      //     month: shamsi.gregorianToJalali(new Date())[1],
+      //     year: shamsi.gregorianToJalali(new Date())[0],
+      //     day: shamsi.gregorianToJalali(new Date())[2],
+      //   });
+      // }
+
+      const { sender, receiver, content } = req.body;
+
+      try {
+        const newMessage = await ChatModel.create({
+          sender,
+          receiver,
+          content,
+        });
+
+        res.status(200).json({
+          message: "Chat Created",
+          status: 200,
+          receiver,
+          date: new Date().toLocaleDateString("fa-ir"),
+        });
+      } catch (err) {
+        console.log(err);
+
+        res.status(500).json({ message: err.message });
+      }
+
+      // res.status(200).json({
+      //   status: 200,
+      //   message: "پیام با موفقیت اضافه شد",
+      //   createDate: new Date().toLocaleDateString("fa-ir"),
+      // });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getChats(req, res, next) {
+    const { user1, user2 } = req.body;
+
+    try {
+      const dataGet = await ChatModel.find({
+        $or: [
+          { sender: user1, receiver: user2 },
+          { sender: user2, receiver: user1 },
+        ],
+      });
+      // res.json(messages);
+
+      res.status(200).json({
+        status: 200,
+        data: { dataGet },
+        message: "پیام با موفقیت دریافت شد",
+        createDate: new Date().toLocaleDateString("fa-ir"),
+      });
+    } catch (err) {
+      next(err);
+      res.status(500).json({
+        status: 500,
+        data: { dataGet },
+        message: err,
+      });
+    }
+
+    // try {
+    //   const { _id } = req.body;
+    //   const authorization = req.headers.authorization;
+    //   const [bearer, token] = authorization.split(" ");
+
+    //   const verifyResult = await verifyAccessToken(token);
+
+    //   const user = await UserModel.findOne({ phone: verifyResult.phone });
+    //   const userPersonel = await UserPersonelModel.findOne({
+    //     phone: verifyResult.phone,
+    //   });
+
+    //   const chatInfo = await ChatModel.findOne({
+    //     deliver: _id,
+    //   });
+
+    //   let dataGet = [];
+    //   let itWasSender;
+
+    //   if (user) {
+    //     dataGet = await ChatModel.find({
+    //       deliver: chatInfo.deliver,
+    //     });
+    //     itWasSender = user._id;
+    //   }
+    //   if (userPersonel) {
+    //     dataGet = await ChatModel.find({
+    //       deliver: chatInfo.deliver,
+    //     });
+    //     itWasSender = userPersonel._id;
+    //   }
+
+    //   res.status(200).json({
+    //     status: 200,
+    //     data: { dataGet },
+    //     itWasSender,
+    //     message: "پیام با موفقیت دریافت شد",
+    //     createDate: new Date().toLocaleDateString("fa-ir"),
+    //   });
+    // } catch (error) {
+    //   next(error);
+    // }
   }
 }
 module.exports = { UserController: new UserController() };

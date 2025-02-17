@@ -2,7 +2,6 @@ const { adminRouted } = require("./routes/admin/admin");
 const { adsRouted } = require("./routes/ads/ads");
 const { authRouted } = require("./routes/auth/auth");
 const { calenderRouted } = require("./routes/calender/calender");
-const { chatRouthed } = require("./routes/chat/chat");
 const { contactsRothed } = require("./routes/contacts/contacts");
 const { leadsRouted } = require("./routes/lead/lead");
 const { officeRouted } = require("./routes/office/office");
@@ -16,6 +15,7 @@ const {
 const { sepidarRouted } = require("./routes/prodution/sepidar/sepidar");
 const { sourceRouted } = require("./routes/prodution/source/source");
 const { rolesRouted } = require("./routes/roles/roles");
+const { smsRouted } = require("./routes/sms/sms");
 const { syncRouted } = require("./routes/sync/sync");
 const { tasksRouted } = require("./routes/tasks/tasks");
 const { uploadImageRouted } = require("./routes/upload/upload.image");
@@ -42,7 +42,8 @@ router.use("/api/v1/plans", plansRouted);
 router.use("/api/v1/admin", adminRouted);
 router.use("/api/v1/office", officeRouted);
 router.use("/api/v1/sync", syncRouted);
-router.use("/api/v1/chat", chatRouthed);
+
+router.use("/api/v1/sms", smsRouted);
 
 module.exports = {
   allRouted: router,

@@ -3,7 +3,9 @@ const router = require("express").Router();
 const {
   UserController,
 } = require("../../../http/controller/auth/auth.controller");
-const { ChartController } = require("../../../http/controller/chart/chart.controller");
+const {
+  ChartController,
+} = require("../../../http/controller/chart/chart.controller");
 const { bearerToken } = require("../../../http/middleware/verifyAccessToken");
 
 /**
@@ -174,6 +176,8 @@ router.post("/login", UserController.login);
 router.post("/sign-check", UserController.signCodeChecker);
 router.post("/create-notif", UserController.createNotif);
 router.post("/create-chart", ChartController.createChart);
+router.post("/create-message", UserController.createChat);
+router.post("/get-message", UserController.getChats);
 
 router.get("/get-user-sign", UserController.getUserSignCode);
 router.get("/get-notif", UserController.getNotifs);

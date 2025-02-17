@@ -7,6 +7,9 @@ const OrdersDataSchema = new Schema({
   adminName: { type: String },
   products: { type: JSON },
   status: { type: String, default: "false" },
+  statusOp: { type: String, default: "false" },
+  statusOpUser: { type: String, default: "-" },
+
   code: { type: String },
   month: { type: String },
   year: { type: String },

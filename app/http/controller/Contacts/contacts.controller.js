@@ -223,70 +223,72 @@ class ContactController extends Controller {
 
       const verifyResult = await verifyAccessToken(token);
       const user = await UserModel.findOne({ phone: verifyResult.phone });
-      const userPersonel = await UserPersonelModel.findOne({ phone: verifyResult.phone });
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
 
       const getFyYear = await FYModel.findOne({
-        adminId: !user ? userPersonel.adminUser :user._id,
+        adminId: !user ? userPersonel.adminUser : user._id,
         activeYear: "active",
       });
 
       const farvardin = await CustomersModel.find({
         year: getFyYear.fyValue,
         month: "1",
-        adminUser: !user ? userPersonel.adminUser :user._id,
+        adminUser: !user ? userPersonel.adminUser : user._id,
       });
       const ordibehesht = await CustomersModel.find({
-        adminUser: !user ? userPersonel.adminUser :user._id,
+        adminUser: !user ? userPersonel.adminUser : user._id,
         year: getFyYear.fyValue,
         month: "2",
       });
       const khordad = await CustomersModel.find({
-        adminUser: !user ? userPersonel.adminUser :user._id,
+        adminUser: !user ? userPersonel.adminUser : user._id,
         year: getFyYear.fyValue,
         month: "3",
       });
       const tir = await CustomersModel.find({
-        adminUser: !user ? userPersonel.adminUser :user._id,
+        adminUser: !user ? userPersonel.adminUser : user._id,
         year: getFyYear.fyValue,
         month: "4",
       });
       const mordad = await CustomersModel.find({
         year: getFyYear.fyValue,
         month: "5",
-        adminUser: !user ? userPersonel.adminUser :user._id,
+        adminUser: !user ? userPersonel.adminUser : user._id,
       });
       const shahrivar = await CustomersModel.find({
-        adminUser: !user ? userPersonel.adminUser :user._id,
+        adminUser: !user ? userPersonel.adminUser : user._id,
         year: getFyYear.fyValue,
         month: "6",
       });
       const mehr = await CustomersModel.find({
-        adminUser: !user ? userPersonel.adminUser :user._id,
+        adminUser: !user ? userPersonel.adminUser : user._id,
         year: getFyYear.fyValue,
         month: "7",
       });
       const aban = await CustomersModel.find({
-        adminUser: !user ? userPersonel.adminUser :user._id,
+        adminUser: !user ? userPersonel.adminUser : user._id,
         year: getFyYear.fyValue,
         month: "8",
       });
       const azar = await CustomersModel.find({
-        adminUser: !user ? userPersonel.adminUser :user._id,
+        adminUser: !user ? userPersonel.adminUser : user._id,
         year: getFyYear.fyValue,
         month: "9",
       });
       const dey = await CustomersModel.find({
-        adminUser: !user ? userPersonel.adminUser :user._id,
+        adminUser: !user ? userPersonel.adminUser : user._id,
         year: getFyYear.fyValue,
         month: "10",
       });
       const bahman = await CustomersModel.find({
-        adminUser: !user ? userPersonel.adminUser :user._id,
+        adminUser: !user ? userPersonel.adminUser : user._id,
         year: getFyYear.fyValue,
         month: "11",
       });
       const esfand = await CustomersModel.find({
-        adminUser: !user ? userPersonel.adminUser :user._id,
+        adminUser: !user ? userPersonel.adminUser : user._id,
         year: getFyYear.fyValue,
         month: "12",
       });
@@ -296,18 +298,18 @@ class ContactController extends Controller {
         message: "تعداد مخاطبان در ماه های مختلف سال مالی دریافت شد",
         year: getFyYear.fyValue,
         data: {
-          farvardin: farvardin.filter((l)=>l.name != " ").length,
-          ordibehesht: ordibehesht.filter((l)=>l.name != " ").length,
-          khordad: khordad.filter((l)=>l.name != " ").length,
-          tir: tir.filter((l)=>l.name != " ").length,
-          mordad: mordad.filter((l)=>l.name != " ").length,
-          shahrivar: shahrivar.filter((l)=>l.name != " ").length,
-          mehr: mehr.filter((l)=>l.name != " ").length,
-          aban: aban.filter((l)=>l.name != " ").length,
-          azar: azar.filter((l)=>l.name != " ").length,
-          dey: dey.filter((l)=>l.name != " ").length,
-          bahman: bahman.filter((l)=>l.name != " ").length,
-          esfand: esfand.filter((l)=>l.name != " ").length,
+          farvardin: farvardin.filter((l) => l.name != " ").length,
+          ordibehesht: ordibehesht.filter((l) => l.name != " ").length,
+          khordad: khordad.filter((l) => l.name != " ").length,
+          tir: tir.filter((l) => l.name != " ").length,
+          mordad: mordad.filter((l) => l.name != " ").length,
+          shahrivar: shahrivar.filter((l) => l.name != " ").length,
+          mehr: mehr.filter((l) => l.name != " ").length,
+          aban: aban.filter((l) => l.name != " ").length,
+          azar: azar.filter((l) => l.name != " ").length,
+          dey: dey.filter((l) => l.name != " ").length,
+          bahman: bahman.filter((l) => l.name != " ").length,
+          esfand: esfand.filter((l) => l.name != " ").length,
         },
         createDate: new Date().toLocaleDateString("fa-ir"),
       });
@@ -324,16 +326,20 @@ class ContactController extends Controller {
 
         const verifyResult = await verifyAccessToken(token);
         const user = await UserModel.findOne({ phone: verifyResult.phone });
-        const userPersonel = await UserPersonelModel.findOne({ phone: verifyResult.phone });
+        const userPersonel = await UserPersonelModel.findOne({
+          phone: verifyResult.phone,
+        });
 
         const dataGet = await CustomersModel.find({
-          adminUser:!user ? userPersonel.adminUser : user._id
+          adminUser: !user ? userPersonel.adminUser : user._id,
         });
 
         res.status(200).json({
           status: 200,
           requestDate: new Date(),
-          data: !dataGet.length ? 0 : dataGet.filter((l)=>l.name != " ").length,
+          data: !dataGet.length
+            ? 0
+            : dataGet.filter((l) => l.name != " ").length,
           message: "تعداد کارشناسان دریافت شدند",
         });
       } catch (error) {
@@ -492,7 +498,7 @@ class ContactController extends Controller {
         };
 
         const randId = getRandomInteger(10000, 99999);
-        const hashedPassword = await sha256pass("123456")
+        const hashedPassword = await sha256pass("123456");
         if (user) {
           const createContact = await CustomersModel.create({
             name,
@@ -577,7 +583,6 @@ class ContactController extends Controller {
     }
   }
 
-
   async editCustomer(req, res, next) {
     try {
       const {
@@ -607,7 +612,7 @@ class ContactController extends Controller {
         phone,
         des,
         userName,
-        password
+        password,
       } = req.body;
 
       try {
@@ -623,74 +628,80 @@ class ContactController extends Controller {
         });
 
         if (user) {
-          const createContact = await CustomersModel.findOneAndUpdate({_id},{
-            name,
-            perName,
-            financialCode,
-            conName,
-            conDes,
-            birthDate,
-            nationalCode,
-            state,
-            city,
-            address,
-            postalCode,
-            workType,
-            relationType,
-            countOfPersonel,
-            ownerShip,
-            connection,
-            type,
-            coType,
-            sabtNumber,
-            buissCode,
-            lon,
-            lat,
-            phone,
-            des,
-            userName,
-            password,
-            adminUser: user._id,
-            adminUserName: user.name + " " + user.lastName,
-            month: shamsi.gregorianToJalali(new Date())[1],
-            year: shamsi.gregorianToJalali(new Date())[0],
-            day: shamsi.gregorianToJalali(new Date())[2],
-          });
+          const createContact = await CustomersModel.findOneAndUpdate(
+            { _id },
+            {
+              name,
+              perName,
+              financialCode,
+              conName,
+              conDes,
+              birthDate,
+              nationalCode,
+              state,
+              city,
+              address,
+              postalCode,
+              workType,
+              relationType,
+              countOfPersonel,
+              ownerShip,
+              connection,
+              type,
+              coType,
+              sabtNumber,
+              buissCode,
+              lon,
+              lat,
+              phone,
+              des,
+              userName,
+              password,
+              adminUser: user._id,
+              adminUserName: user.name + " " + user.lastName,
+              month: shamsi.gregorianToJalali(new Date())[1],
+              year: shamsi.gregorianToJalali(new Date())[0],
+              day: shamsi.gregorianToJalali(new Date())[2],
+            }
+          );
         }
         if (userPersonel) {
-          const createContact = await CustomersModel.findOneAndUpdate({_id},{
-            name,
-            perName,
-            financialCode,
-            conName,
-            conDes,
-            birthDate,
-            nationalCode,
-            state,
-            city,
-            address,
-            postalCode,
-            workType,
-            relationType,
-            countOfPersonel,
-            ownerShip,
-            connection,
-            type,
-            coType,
-            sabtNumber,
-            buissCode,
-            lon,
-            lat,
-            phone,
-            des,
-            userName,
-            password,
-            adminUser: userPersonel.adminUser,
-            adminUserName: userPersonel.name + " " + userPersonel.lastName,
-            month: shamsi.gregorianToJalali(new Date())[1],
-            year: shamsi.gregorianToJalali(new Date())[0],
-            day: shamsi.gregorianToJalali(new Date())[2],
-          });
+          const createContact = await CustomersModel.findOneAndUpdate(
+            { _id },
+            {
+              name,
+              perName,
+              financialCode,
+              conName,
+              conDes,
+              birthDate,
+              nationalCode,
+              state,
+              city,
+              address,
+              postalCode,
+              workType,
+              relationType,
+              countOfPersonel,
+              ownerShip,
+              connection,
+              type,
+              coType,
+              sabtNumber,
+              buissCode,
+              lon,
+              lat,
+              phone,
+              des,
+              userName,
+              password,
+              adminUser: userPersonel.adminUser,
+              adminUserName: userPersonel.name + " " + userPersonel.lastName,
+              month: shamsi.gregorianToJalali(new Date())[1],
+              year: shamsi.gregorianToJalali(new Date())[0],
+              day: shamsi.gregorianToJalali(new Date())[2],
+            }
+          );
         }
 
         res.status(202).json({
@@ -743,21 +754,16 @@ class ContactController extends Controller {
       let dataGet = [];
 
       if (user) {
-        (dataGet = await CustomersModel.find({
-          
-        })).reverse();
+        (dataGet = await CustomersModel.find({})).reverse();
       }
       if (userPersonel) {
-        if(userPersonel.access == "1"){
-          (dataGet = await CustomersModel.find({
-          
-          })).reverse();
-        }else{
+        if (userPersonel.access == "1") {
+          (dataGet = await CustomersModel.find({})).reverse();
+        } else {
           (dataGet = await CustomersModel.find({
             adminUser: userPersonel._id,
           })).reverse();
         }
-        
       }
 
       res.status(202).json({
@@ -773,37 +779,41 @@ class ContactController extends Controller {
 
   async getCustomersMandeAndScore(req, res, next) {
     try {
-
-      const {userId,tokenTak} = req.body
+      const { userId, tokenTak } = req.body;
       const authorization = req.headers.authorization;
       const [bearer, token] = authorization.split(" ");
 
-
-      const fetchDataMande = await fetch(baseUrl(`/services/Base/ApiService/GetDebitRemain?FiscalYear=1403&AcntCode=${userId}`), {
-        method: "GET",
-        headers: {
+      const fetchDataMande = await fetch(
+        baseUrl(
+          `/services/Base/ApiService/GetDebitRemain?FiscalYear=1403&AcntCode=${userId}`
+        ),
+        {
+          method: "GET",
+          headers: {
             Authorization: `Bearer ${tokenTak}`,
             "Content-Type": "application/json",
-            "Abp.TenantId": "1"
+            "Abp.TenantId": "1",
+          },
         }
-    });
+      );
 
-    const responseDataMande = await fetchDataMande.json();
+      const responseDataMande = await fetchDataMande.json();
 
+      const fetchDataScore = await fetch(
+        baseUrl(
+          `/services/Base/ApiService/GetCustomerScore?FiscalYear=1403&AcntCode=${userId}`
+        ),
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${tokenTak}`,
+            "Content-Type": "application/json",
+            "Abp.TenantId": "1",
+          },
+        }
+      );
 
-    const fetchDataScore = await fetch(baseUrl(`/services/Base/ApiService/GetCustomerScore?FiscalYear=1403&AcntCode=${userId}`), {
-      method: "GET",
-      headers: {
-          Authorization: `Bearer ${tokenTak}`,
-          "Content-Type": "application/json",
-          "Abp.TenantId": "1"
-      }
-  });
-
-  const responseDataScore = await fetchDataScore.json();
-
-      
-
+      const responseDataScore = await fetchDataScore.json();
 
       // const verifyResult = await verifyAccessToken(token);
       // const user = await UserModel.findOne({
@@ -838,14 +848,8 @@ class ContactController extends Controller {
     }
   }
 
-
   async addOrder(req, res, next) {
-    const {
-      products,
-      title,
-    
-     
-    } = req.body; // products باید یک آرایه از اشیاء باشد
+    const { products, title } = req.body; // products باید یک آرایه از اشیاء باشد
     try {
       const authorization = req.headers.authorization;
       const [bearer, token] = authorization.split(" ");
@@ -872,48 +876,44 @@ class ContactController extends Controller {
 
       const randId = getRandomInteger(10000, 99999);
 
-
       if (user) {
         const addOrder = await OrdersModel.create({
           products,
           adminId: user._id,
           adminName: user.name + " " + user.lastName,
           title,
-     
-          code:randId,
+
+          code: randId,
           month: shamsi.gregorianToJalali(new Date())[1],
           year: shamsi.gregorianToJalali(new Date())[0],
         });
       }
 
       if (userPersonel) {
-      
         const addOrder = await OrdersModel.create({
           products,
           adminId: userPersonel._id,
           adminName: userPersonel.name + " " + userPersonel.lastName,
           title,
-    
-          code:randId,
+
+          code: randId,
           month: shamsi.gregorianToJalali(new Date())[1],
           year: shamsi.gregorianToJalali(new Date())[0],
         });
       }
 
-if(userCustomer){
+      if (userCustomer) {
+        const addOrder = await OrdersModel.create({
+          products,
+          adminId: userCustomer._id,
+          adminName: userCustomer.name,
+          title,
 
-  const addOrder = await OrdersModel.create({
-    products,
-    adminId: userCustomer._id,
-    adminName: userCustomer.name ,
-    title,
-
-    code:randId,
-    month: shamsi.gregorianToJalali(new Date())[1],
-    year: shamsi.gregorianToJalali(new Date())[0],
-  });
-
-}
+          code: randId,
+          month: shamsi.gregorianToJalali(new Date())[1],
+          year: shamsi.gregorianToJalali(new Date())[0],
+        });
+      }
 
       res.status(202).json({
         status: 202,
@@ -933,7 +933,6 @@ if(userCustomer){
   }
 
   async getOrder(req, res, next) {
-  
     try {
       const authorization = req.headers.authorization;
       const [bearer, token] = authorization.split(" ");
@@ -950,20 +949,18 @@ if(userCustomer){
       const userCustomer = await CustomersModel.findOne({
         _id: verifyResult.userID,
       });
-     
 
-    let dataGet = []
+      let dataGet = [];
 
       if (user) {
         dataGet = (await OrdersModel.find()).reverse();
       }
 
       if (userPersonel) {
-      
         dataGet = (await OrdersModel.find()).reverse();
       }
 
-      if(userCustomer){
+      if (userCustomer) {
         dataGet = await OrdersModel.find({
           adminId: userCustomer._id,
         });
@@ -971,7 +968,7 @@ if(userCustomer){
       res.status(202).json({
         status: 202,
         message: "اطلاعات دریافت شد",
-        data: {dataGet},
+        data: { dataGet },
         createDate: new Date().toLocaleDateString("fa-ir"),
       });
     } catch (error) {
@@ -1012,11 +1009,46 @@ if(userCustomer){
     }
   }
 
+  async orderOpConfirm(req, res, next) {
+    try {
+      const { _id } = req.body;
+
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+      const verifyResult = await verifyAccessToken(token);
+
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      try {
+        const dataConf = await OrdersModel.findOneAndUpdate(
+          {
+            _id,
+          },
+          {
+            statusOp: "true",
+            statusOpUser: userPersonel.name + " " + userPersonel.lastName,
+          }
+        );
+
+        res.status(202).json({
+          status: 202,
+          message: "اطلاعات بروز شد",
+
+          createDate: new Date().toLocaleDateString("fa-ir"),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async transferCustomer(req, res, next) {
     try {
       const { _id, adminId } = req.body;
-
-
 
       // console.log({ _id, adminId });
       try {
@@ -1026,9 +1058,6 @@ if(userCustomer){
         const userPersonel = await UserPersonelModel.findOne({
           _id: adminId,
         });
-
-        
-        
 
         if (user) {
           const createContact = await CustomersModel.findOneAndUpdate(
@@ -1062,30 +1091,29 @@ if(userCustomer){
     }
   }
 
-
- async getGhardesh(req, res, next) {
+  async getGhardesh(req, res, next) {
     try {
-      const { tokenTakro,code } = req.body;
-
-
+      const { tokenTakro, code } = req.body;
 
       // console.log({ _id, adminId });
       try {
-    
-        const fetchData = await fetch(baseUrl(`/services/Base/ApiService/GetAccountTurnover?FiscalYear=1403&AcntCode=${code}`), {
-          method: "GET",
-          headers: {
+        const fetchData = await fetch(
+          baseUrl(
+            `/services/Base/ApiService/GetAccountTurnover?FiscalYear=1403&AcntCode=${code}`
+          ),
+          {
+            method: "GET",
+            headers: {
               Authorization: `Bearer ${tokenTakro}`,
               "Content-Type": "application/json",
-              "Abp.TenantId": "1"
+              "Abp.TenantId": "1",
+            },
           }
-      });
+        );
 
-      const responseData = await fetchData.json();
+        const responseData = await fetchData.json();
 
-      console.log(responseData);
-      
-   
+        console.log(responseData);
 
         res.status(202).json({
           status: 202,
@@ -1103,27 +1131,29 @@ if(userCustomer){
 
   async getMandeh(req, res, next) {
     try {
-      const { tokenTakro,code } = req.body;
+      const { tokenTakro, code } = req.body;
 
-     const month= shamsi.gregorianToJalali(new Date())[1];
-     const year= shamsi.gregorianToJalali(new Date())[0];
-     const day= shamsi.gregorianToJalali(new Date())[2];
+      const month = shamsi.gregorianToJalali(new Date())[1];
+      const year = shamsi.gregorianToJalali(new Date())[0];
+      const day = shamsi.gregorianToJalali(new Date())[2];
 
       // console.log({ _id, adminId });
       try {
-    
-        const fetchData = await fetch(baseUrl(`/services/Base/ApiService/GetDebitRemain?FiscalYear=1403&AcntCode=${code}&DocDate=${year}/${month}/${day}`), {
-          method: "GET",
-          headers: {
+        const fetchData = await fetch(
+          baseUrl(
+            `/services/Base/ApiService/GetDebitRemain?FiscalYear=1403&AcntCode=${code}&DocDate=${year}/${month}/${day}`
+          ),
+          {
+            method: "GET",
+            headers: {
               Authorization: `Bearer ${tokenTakro}`,
               "Content-Type": "application/json",
-              "Abp.TenantId": "1"
+              "Abp.TenantId": "1",
+            },
           }
-      });
+        );
 
-      const responseData = await fetchData.json();
-      
-   
+        const responseData = await fetchData.json();
 
         res.status(202).json({
           status: 202,
@@ -1138,6 +1168,5 @@ if(userCustomer){
       next(err);
     }
   }
-
 }
 module.exports = { ContactController: new ContactController() };

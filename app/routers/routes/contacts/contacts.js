@@ -398,9 +398,19 @@ const {
 
 router.post("/create", bearerTokenVisitor, ContactController.createContact);
 router.post("/create-customer", bearerToken, ContactController.createCustomer);
-router.post("/get-customers-data", bearerToken, ContactController.getCustomersMandeAndScore);
+router.post(
+  "/get-customers-data",
+  bearerToken,
+  ContactController.getCustomersMandeAndScore
+);
 router.post("/add-order", ContactController.addOrder);
 router.post("/confirm-order", bearerToken, ContactController.orderAdminConfirm);
+router.post(
+  "/confirm-order-operator",
+  bearerToken,
+  ContactController.orderOpConfirm
+);
+
 router.post("/get-gardesh", bearerToken, ContactController.getGhardesh);
 router.post("/get-mande", bearerToken, ContactController.getMandeh);
 
@@ -457,7 +467,7 @@ router.get(
 router.get("/get-customers", bearerToken, ContactController.getCustomers);
 
 router.delete("/remove", bearerTokenVisitor, ContactController.removeContacts);
-router.delete("/remove-cus",  ContactController.removeCustomer);
+router.delete("/remove-cus", ContactController.removeCustomer);
 
 module.exports = {
   contactsRothed: router,

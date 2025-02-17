@@ -1,3 +1,7 @@
+const { UserModel } = require("../../../models/auth/auth.model");
+const { SmsModel } = require("../../../models/sms/sms.model");
+const { UserPersonelModel } = require("../../../models/users/users.model");
+const { verifyAccessToken } = require("../../../modules/functions");
 const Controller = require("../controller");
 const request = require("request");
 
@@ -5,7 +9,19 @@ const request = require("request");
 class SMSController extends Controller {
   async sendSMS(req, res, next) {
     try {
-      const { numbers, message } = req.body;
+      const { numbers, message, title } = req.body;
+
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+
+      const verifyResult = await verifyAccessToken(token);
+      const user = await UserModel.findOne({
+        phone: verifyResult.phone,
+      });
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
+
       try {
         request.post(
           {
@@ -17,17 +33,39 @@ class SMSController extends Controller {
               message: message,
               from: "3000505 ",
               to: numbers,
-              time: "",
             },
             json: true,
           },
-          function (error, response, body) {
+          async function (error, response, body) {
             if (!error && response.statusCode === 200) {
               //YOU‌ CAN‌ CHECK‌ THE‌ RESPONSE‌ AND SEE‌ ERROR‌ OR‌ SUCCESS‌ MESSAGE
+
+              if (user) {
+                const createSms = await SmsModel.create({
+                  title,
+                  message,
+                  numbers,
+                  administrator: user._id,
+                  adminUser: user._id,
+                  adminUserName: user.name + " " + user.lastName,
+                });
+              }
+
+              if (userPersonel) {
+                const createSms = await SmsModel.create({
+                  title,
+                  message,
+                  numbers,
+                  administrator: userPersonel.adminUser,
+                  adminUser: userPersonel._id,
+                  adminUserName:
+                    userPersonel.name + " " + userPersonel.lastName,
+                });
+              }
+
               res.status(202).json({
                 status: 202,
-                numbers,
-                message: response.body,
+                message: "پیام ارسال شد",
                 createDate: new Date(),
               });
             } else {
@@ -40,6 +78,44 @@ class SMSController extends Controller {
       }
     } catch (err) {
       next(err);
+    }
+  }
+
+  async getSms(req, res, next) {
+    try {
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+
+      const verifyResult = await verifyAccessToken(token);
+      const user = await UserModel.findOne({
+        phone: verifyResult.phone,
+      });
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      let dataGet = [];
+
+      if (user) {
+        (dataGet = await SmsModel.find({
+          administrator: user._id,
+        })).reverse();
+      }
+
+      if (userPersonel) {
+        (dataGet = await SmsModel.find({
+          adminUser: userPersonel._id,
+        })).reverse();
+      }
+
+      res.status(202).json({
+        status: 202,
+        message: "اطلاعات دریافت شد",
+        data: { dataGet },
+        createDate: new Date().toLocaleDateString("fa-ir"),
+      });
+    } catch (error) {
+      next(error);
     }
   }
 }

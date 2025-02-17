@@ -10,7 +10,7 @@ const { verifyAccessToken } = require("../../../modules/functions");
 const { sha256pass } = require("../../../utils/access");
 const Controller = require("../controller");
 var shamsi = require("shamsi-date-converter");
-const axios = require('axios');
+const axios = require("axios");
 const { baseUrl } = require("../../../utils/baseUrl");
 const { body } = require("express-validator");
 
@@ -96,6 +96,96 @@ class OfficeController extends Controller {
       next(err);
     }
   }
+
+  async createSign(req, res, next) {
+    try {
+      const { signStatus, _id } = req.body;
+
+      try {
+        const authorization = req.headers.authorization;
+        const [bearer, token] = authorization.split(" ");
+
+        const verifyResult = await verifyAccessToken(token);
+        const user = await UserModel.findOne({
+          phone: verifyResult.phone,
+        });
+
+        const getRandomInteger = (min, max) => {
+          min = Math.ceil(min);
+          max = Math.floor(max);
+
+          return Math.floor(Math.random() * (max - min)) + min;
+        };
+
+        const signCode = getRandomInteger(10000, 99999);
+
+        if (user) {
+          const createLeave = await UserPersonelModel.findOneAndUpdate(
+            { _id },
+            {
+              signCode,
+              signStatus,
+            }
+          );
+        }
+
+        res.status(202).json({
+          status: 202,
+          message: ` درخواست حق امضا ثبت شد`,
+          createDate: new Date(),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  // async removeSign(req, res, next) {
+  //   try {
+  //     const { signStatus, _id } = req.body;
+
+  //     try {
+  //       const authorization = req.headers.authorization;
+  //       const [bearer, token] = authorization.split(" ");
+
+  //       const verifyResult = await verifyAccessToken(token);
+  //       const user = await UserModel.findOne({
+  //         phone: verifyResult.phone,
+  //       });
+
+  //       const getRandomInteger = (min, max) => {
+  //         min = Math.ceil(min);
+  //         max = Math.floor(max);
+
+  //         return Math.floor(Math.random() * (max - min)) + min;
+  //       };
+
+  //       const signCode = getRandomInteger(10000, 99999);
+
+  //       if (user) {
+  //         const createLeave = await UserPersonelModel.findOneAndUpdate(
+  //           { _id },
+  //           {
+  //             signCode,
+  //             signStatus,
+  //           }
+  //         );
+  //       }
+
+  //       res.status(202).json({
+  //         status: 202,
+  //         message: ` درخواست حق امضا ثبت شد`,
+  //         createDate: new Date(),
+  //       });
+  //     } catch (error) {
+  //       next(error);
+  //     }
+  //   } catch (err) {
+  //     next(err);
+  //   }
+  // }
 
   async getLeaveRequester(req, res, next) {
     try {
@@ -296,7 +386,6 @@ class OfficeController extends Controller {
       } = req.body;
 
       try {
-
         const hashedPassword = await sha256pass(password);
 
         const editPersonel = await UserPersonelModel.findOneAndUpdate(
@@ -313,7 +402,7 @@ class OfficeController extends Controller {
             email,
             type,
             access,
-            password:hashedPassword
+            password: hashedPassword,
           }
         );
         res.status(200).json({
@@ -343,76 +432,92 @@ class OfficeController extends Controller {
           phone: verifyResult.phone,
         });
 
-    
-        
-
         let dataGet = [];
 
-
-        if(user){
-          dataGet = (
-            await UserPersonelModel.find({
-              adminUser: user._id,
-            })
-          );
+        if (user) {
+          dataGet = await UserPersonelModel.find({
+            adminUser: user._id,
+          });
         }
 
-        if(userPersonel){
-          dataGet = (
-            await UserPersonelModel.find({
-              adminUser: userPersonel.adminUser,
-            })
-          );
+        if (userPersonel) {
+          dataGet = await UserPersonelModel.find({
+            adminUser: userPersonel.adminUser,
+          });
         }
-
-
-
-     
-
-       
-
-        
-
-
-        
-
 
         // console.log(getResponseData);
 
-      //   const responseToken = await axios.post(baseUrl("/TokenAuth/Authenticate"), {
-      //     // داده‌هایی که برای درخواست به API اول نیاز دارید
-      //     headers: {
-      //      "Content-Type": "application/json", // اضافه کردن توکن به هدر
-      //   },
-      //     body: {
-      //       "userNameOrEmailAddress": "admin",
-      //       "password": "123qwe",
-      //       "twoFactorVerificationCode": "string",
-      //       "rememberClient": true,
-      //       "twoFactorRememberClientToken": "string",
-      //       "singleSignIn": true,
-      //       "returnUrl": "string",
-      //       "captchaResponse": "string"
-      //     }
-      // });
-      
-      // const token = responseToken.data.result.accessToken; // فرض بر این است که توکن در اینجا دریافت می‌شود
+        //   const responseToken = await axios.post(baseUrl("/TokenAuth/Authenticate"), {
+        //     // داده‌هایی که برای درخواست به API اول نیاز دارید
+        //     headers: {
+        //      "Content-Type": "application/json", // اضافه کردن توکن به هدر
+        //   },
+        //     body: {
+        //       "userNameOrEmailAddress": "admin",
+        //       "password": "123qwe",
+        //       "twoFactorVerificationCode": "string",
+        //       "rememberClient": true,
+        //       "twoFactorRememberClientToken": "string",
+        //       "singleSignIn": true,
+        //       "returnUrl": "string",
+        //       "captchaResponse": "string"
+        //     }
+        // });
 
-      // // مرحله دوم: درخواست به API دوم با استفاده از توکن در هدر
-      // const responseData = await axios.get(baseUrl("/service/Base/ApiService/GetPersennels"), {
-      //     headers: {
-      //         Authorization: `Bearer ${token}`, // اضافه کردن توکن به هدر
-      //     "Abp.TenantId" :"1"
-      //       }
-      // });
+        // const token = responseToken.data.result.accessToken; // فرض بر این است که توکن در اینجا دریافت می‌شود
 
-
-
-
+        // // مرحله دوم: درخواست به API دوم با استفاده از توکن در هدر
+        // const responseData = await axios.get(baseUrl("/service/Base/ApiService/GetPersennels"), {
+        //     headers: {
+        //         Authorization: `Bearer ${token}`, // اضافه کردن توکن به هدر
+        //     "Abp.TenantId" :"1"
+        //       }
+        // });
 
         res.status(202).json({
           status: 202,
-          data: {dataGet},
+          data: { dataGet },
+          message: ` کاربران دریافت شد`,
+          createDate: new Date(),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getPersonelsChat(req, res, next) {
+    try {
+      try {
+        const authorization = req.headers.authorization;
+        const [bearer, token] = authorization.split(" ");
+
+        const verifyResult = await verifyAccessToken(token);
+        const user = await UserModel.findOne({
+          phone: verifyResult.phone,
+        });
+        const userPersonel = await UserPersonelModel.findOne({
+          phone: verifyResult.phone,
+        });
+
+        const dataGet1 = (
+          await UserPersonelModel.find({
+            adminUser: !user ? userPersonel.adminUser : user._id,
+          })
+        ).reverse();
+        const dataGet2 = (
+          await UserModel.find({
+            _id: !user ? userPersonel.adminUser : user._id,
+          })
+        ).reverse();
+
+        const dataGet = [...dataGet1, ...dataGet2];
+        res.status(202).json({
+          status: 202,
+          data: { dataGet },
           message: ` کاربران دریافت شد`,
           createDate: new Date(),
         });

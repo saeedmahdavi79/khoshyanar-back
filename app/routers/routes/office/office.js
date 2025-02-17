@@ -366,8 +366,15 @@ router.post("/create-leave", bearerToken, OfficeController.createLeave);
 router.post("/create-personel", bearerToken, OfficeController.createPersonel);
 router.post("/create-zonkan", bearerToken, OfficeController.createZonkan);
 router.post("/create-letter", bearerToken, OfficeController.createLetter);
+router.post("/create-sign", bearerToken, OfficeController.createSign);
+
 //
-router.get("/get-personel",  OfficeController.getPersonels);
+router.get("/get-personel", OfficeController.getPersonels);
+router.get(
+  "/get-personel-chat",
+  bearerToken,
+  OfficeController.getPersonelsChat
+);
 router.get("/get-admin-leave", bearerToken, OfficeController.getLeaveAdmin);
 router.get("/get-zonkan", bearerToken, OfficeController.getZonkan);
 router.get("/get-letters", bearerToken, OfficeController.getLetters);
