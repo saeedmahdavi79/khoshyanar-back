@@ -1,4 +1,4 @@
-const { Types } = require("mongoose");
+const { Types, isValidObjectId } = require("mongoose");
 const { UserModel } = require("../../../models/auth/auth.model");
 const { LeaveModel } = require("../../../models/leave/leave.model");
 const { LetterModel } = require("../../../models/letter/letter.model");
@@ -13,6 +13,9 @@ var shamsi = require("shamsi-date-converter");
 const axios = require("axios");
 const { baseUrl } = require("../../../utils/baseUrl");
 const { body } = require("express-validator");
+const OrganizitonChartModel = require("../../../models/orgChart/orgChart");
+
+const { default: slugify } = require("slugify");
 
 //Public Class
 class OfficeController extends Controller {
