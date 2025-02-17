@@ -1,0 +1,10 @@
+{
+  "disks": [
+    {
+      "name": "crm",
+      "mountTo": "public/upload"
+    }
+  ],
+  "app": "afracrmbc",
+  "port": "8282"
+}

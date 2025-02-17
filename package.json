@@ -1,0 +1,39 @@
+{
+  "name": "back-ll",
+  "version": "1.0.0",
+  "description": "Backend LL",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon node index.js",
+    "start": "nodemon node index.js"
+  },
+  "author": "Afra System Company",
+  "license": "MIT",
+  "dependencies": {
+    "auto-bind": "^3.0.0",
+    "axios": "^1.7.9",
+    "cheerio": "^1.0.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "express-device": "^0.4.2",
+    "express-validator": "^7.0.1",
+    "http-errors": "^2.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.3.4",
+    "mongoose-autopopulate": "^1.1.0",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.1.0",
+    "path": "^0.12.7",
+    "playwright": "^1.49.1",
+    "puppeteer-core": "^23.10.3",
+    "random-username-generator": "^1.0.4",
+    "request": "^2.88.2",
+    "sha256": "^0.2.0",
+    "shamsi-date-converter": "^1.0.5",
+    "slugify": "^1.6.6",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
+  }
+}
