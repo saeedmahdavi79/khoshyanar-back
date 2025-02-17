@@ -403,6 +403,8 @@ router.post(
   bearerToken,
   ContactController.getCustomersMandeAndScore
 );
+router.get("/get-customers-state", ContactController.getCustomersInState);
+
 router.post("/add-order", ContactController.addOrder);
 router.post("/confirm-order", bearerToken, ContactController.orderAdminConfirm);
 router.post(

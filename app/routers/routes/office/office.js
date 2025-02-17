@@ -7,6 +7,9 @@ const {
   OfficeController,
 } = require("../../../http/controller/office/office.controller");
 const {
+  ProductReportController,
+} = require("../../../http/controller/production/product/report/report.controller");
+const {
   bearerToken,
   bearerTokenVisitor,
 } = require("../../../http/middleware/verifyAccessToken");
@@ -367,6 +370,7 @@ router.post("/create-personel", bearerToken, OfficeController.createPersonel);
 router.post("/create-zonkan", bearerToken, OfficeController.createZonkan);
 router.post("/create-letter", bearerToken, OfficeController.createLetter);
 router.post("/create-sign", bearerToken, OfficeController.createSign);
+router.post("/create-chart", bearerToken, OfficeController.createChart);
 
 //
 router.get("/get-personel", OfficeController.getPersonels);
@@ -379,7 +383,17 @@ router.get("/get-admin-leave", bearerToken, OfficeController.getLeaveAdmin);
 router.get("/get-zonkan", bearerToken, OfficeController.getZonkan);
 router.get("/get-letters", bearerToken, OfficeController.getLetters);
 router.get("/get-leaves", bearerToken, OfficeController.getLeaves);
-
+router.get("/get-chart", bearerToken, OfficeController.getAllCharts);
+router.get(
+  "/get-letters-Count",
+  bearerToken,
+  ProductReportController.getCountOLetters
+);
+router.get(
+  "/get-leaves-Count",
+  bearerToken,
+  ProductReportController.getCountOLeaves
+);
 //
 router.put("/edit-personel", bearerToken, OfficeController.editPersonel);
 router.put("/conf-letter", bearerToken, OfficeController.letterAdminConfirm);
@@ -394,6 +408,7 @@ router.delete(
 );
 router.delete("/remove-letter", bearerToken, OfficeController.removeLetter);
 router.delete("/remove-zonkan", bearerToken, OfficeController.removeZonkan);
+router.delete("/remove-chart", bearerToken, OfficeController.deleteChart);
 
 module.exports = {
   officeRouted: router,

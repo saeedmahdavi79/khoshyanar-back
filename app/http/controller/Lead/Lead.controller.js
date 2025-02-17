@@ -39,77 +39,74 @@ class LeadController extends Controller {
         leadCompanyCount,
       } = req.body;
 
-     
-        try {
-          const authorization = req.headers.authorization;
-          const [bearer, token] = authorization.split(" ");
+      try {
+        const authorization = req.headers.authorization;
+        const [bearer, token] = authorization.split(" ");
 
-          const verifyResult = await verifyAccessToken(token);
-          const user = await UserModel.findOne({
-            phone: verifyResult.phone,
-          });
-          const userPersonel = await UserPersonelModel.findOne({
-            phone: verifyResult.phone,
-          });
+        const verifyResult = await verifyAccessToken(token);
+        const user = await UserModel.findOne({
+          phone: verifyResult.phone,
+        });
+        const userPersonel = await UserPersonelModel.findOne({
+          phone: verifyResult.phone,
+        });
 
-          if(user){
-            const createLead = await LeadModel.create({
-              leadName,
-              leadSubject,
-              adminUser: user._id,
-              adminUserName: user.name + " " + user.lastName,
-              leadCompany,
-              leadCompanyId,
-              leadPosition,
-              leadEmail,
-              staticPhone,
-              phone,
-              leadWebsite,
-              leadAddress,
-              leadType,
-              leadSource,
-              leadLevel,
-              leadStatus,
-              leadCompanyCount,
-              month: shamsi.gregorianToJalali(new Date())[1],
-              year: shamsi.gregorianToJalali(new Date())[0],
-              day: shamsi.gregorianToJalali(new Date())[2],
-            });
-          }
-          if(userPersonel){
-            const createLead = await LeadModel.create({
-              leadName,
-              leadSubject,
-              adminUser: userPersonel.adminUser,
-              adminUserName: userPersonel.name + " " + userPersonel.lastName,
-              leadCompany,
-              leadCompanyId,
-              leadPosition,
-              leadEmail,
-              staticPhone,
-              phone,
-              leadWebsite,
-              leadAddress,
-              leadType,
-              leadSource,
-              leadLevel,
-              leadStatus,
-              leadCompanyCount,
-              month: shamsi.gregorianToJalali(new Date())[1],
-              year: shamsi.gregorianToJalali(new Date())[0],
-              day: shamsi.gregorianToJalali(new Date())[2],
-            });
-          }
-         
-
-          res.status(202).json({
-            status: 202,
-            message: ` سرنخ : ${leadName} ایجاد شد`,
-            createDate: new Date().toLocaleDateString("fa-ir"),
+        if (user) {
+          const createLead = await LeadModel.create({
+            leadName,
+            leadSubject,
+            adminUser: user._id,
+            adminUserName: user.name + " " + user.lastName,
+            leadCompany,
+            leadCompanyId,
+            leadPosition,
+            leadEmail,
+            staticPhone,
+            phone,
+            leadWebsite,
+            leadAddress,
+            leadType,
+            leadSource,
+            leadLevel,
+            leadStatus,
+            leadCompanyCount,
+            month: shamsi.gregorianToJalali(new Date())[1],
+            year: shamsi.gregorianToJalali(new Date())[0],
+            day: shamsi.gregorianToJalali(new Date())[2],
           });
-        } catch (error) {
-          next(error);
-        
+        }
+        if (userPersonel) {
+          const createLead = await LeadModel.create({
+            leadName,
+            leadSubject,
+            adminUser: userPersonel.adminUser,
+            adminUserName: userPersonel.name + " " + userPersonel.lastName,
+            leadCompany,
+            leadCompanyId,
+            leadPosition,
+            leadEmail,
+            staticPhone,
+            phone,
+            leadWebsite,
+            leadAddress,
+            leadType,
+            leadSource,
+            leadLevel,
+            leadStatus,
+            leadCompanyCount,
+            month: shamsi.gregorianToJalali(new Date())[1],
+            year: shamsi.gregorianToJalali(new Date())[0],
+            day: shamsi.gregorianToJalali(new Date())[2],
+          });
+        }
+
+        res.status(202).json({
+          status: 202,
+          message: ` سرنخ : ${leadName} ایجاد شد`,
+          createDate: new Date().toLocaleDateString("fa-ir"),
+        });
+      } catch (error) {
+        next(error);
       }
     } catch (err) {
       next(err);
@@ -129,20 +126,18 @@ class LeadController extends Controller {
         const userPersonel = await UserPersonelModel.findOne({
           phone: verifyResult.phone,
         });
-       
+
         let dataGet = [];
 
-        if(user){
+        if (user) {
           dataGet = await LeadModel.find({
-            adminUser: user._id
+            adminUser: user._id,
           });
-
         }
-        if(userPersonel){
+        if (userPersonel) {
           dataGet = await LeadModel.find({
-            adminUser: userPersonel.adminUser
+            adminUser: userPersonel.adminUser,
           });
-
         }
         res.status(200).json({
           status: 200,
@@ -589,14 +584,193 @@ class LeadController extends Controller {
         const dataFind = await LeadModel.findOneAndDelete({
           _id,
         });
-        
 
         res.status(200).json({
           status: 200,
           requestDate: new Date(),
           message: "Remove Successfully!",
         });
+      } catch (error) {
+        next(error);
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
 
+  async createContract(req, res, next) {
+    try {
+      const {
+        name,
+        coName,
+        text,
+        date,
+        type,
+        phone,
+        contractName,
+        contractPrice,
+        contractStep,
+      } = req.body;
+
+      try {
+        const authorization = req.headers.authorization;
+        const [bearer, token] = authorization.split(" ");
+
+        const verifyResult = await verifyAccessToken(token);
+        const user = await UserModel.findOne({
+          phone: verifyResult.phone,
+        });
+        const userPersonel = await UserPersonelModel.findOne({
+          phone: verifyResult.phone,
+        });
+
+        if (user) {
+          const createContract = await ContractModel.create({
+            name,
+            coName,
+            adminUser: user._id,
+            adminUserName: user.name + " " + user.lastName,
+            text,
+            date,
+            type,
+            phone,
+            contractName,
+            contractStep,
+            contractPrice,
+            month: shamsi.gregorianToJalali(new Date())[1],
+            year: shamsi.gregorianToJalali(new Date())[0],
+            day: shamsi.gregorianToJalali(new Date())[2],
+          });
+        }
+        if (userPersonel) {
+          const createContract = await ContractModel.create({
+            name,
+            coName,
+            adminUser: userPersonel.adminUser,
+            adminUserName: userPersonel.name + " " + userPersonel.lastName,
+            text,
+            date,
+            type,
+            phone,
+            contractName,
+            contractStep,
+            contractPrice,
+            month: shamsi.gregorianToJalali(new Date())[1],
+            year: shamsi.gregorianToJalali(new Date())[0],
+            day: shamsi.gregorianToJalali(new Date())[2],
+          });
+        }
+
+        res.status(202).json({
+          status: 202,
+          message: ` معامله ایجاد شد`,
+          createDate: new Date().toLocaleDateString("fa-ir"),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getAllContracts(req, res, next) {
+    try {
+      try {
+        const authorization = req.headers.authorization;
+        const [bearer, token] = authorization.split(" ");
+
+        const verifyResult = await verifyAccessToken(token);
+        const user = await UserModel.findOne({
+          phone: verifyResult.phone,
+        });
+        const userPersonel = await UserPersonelModel.findOne({
+          phone: verifyResult.phone,
+        });
+
+        let dataGet = [];
+
+        if (user) {
+          dataGet = await ContractModel.find({
+            adminUser: user._id,
+          });
+        }
+        if (userPersonel) {
+          dataGet = await ContractModel.find({
+            adminUser: userPersonel.adminUser,
+          });
+        }
+        res.status(200).json({
+          status: 200,
+          requestDate: new Date(),
+          data: { dataGet },
+          message: "معاملات دریافت شدند !",
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async editContract(req, res, next) {
+    try {
+      const {
+        _id,
+        name,
+        coName,
+        text,
+        date,
+        type,
+        phone,
+        contractName,
+        contractStep,
+      } = req.body;
+
+      if (!_id && !leadName) {
+        res.status(500).json({
+          status: 500,
+          message: "اطلاعات ارسالی کامل نمی باشد ، لطفا مجدد بازبینی کنید",
+          requestDate: new Date().toLocaleDateString("fa-ir"),
+        });
+      } else {
+        const putVisitor = await ContractModel.findOneAndUpdate(
+          { _id },
+          {
+            name,
+            coName,
+            text,
+            date,
+            type,
+            phone,
+            contractName,
+            contractStep,
+          }
+        );
+        res.status(202).json({
+          status: 202,
+          message: ` معامله ویرایش شد`,
+          createDate: new Date().toLocaleDateString("fa-ir"),
+        });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+  async removeContract(req, res, next) {
+    try {
+      const { _id } = req.body;
+      try {
+        const dataFind = await ContractModel.findOneAndDelete({
+          _id,
+        });
+
+        res.status(200).json({
+          status: 200,
+          requestDate: new Date(),
+          message: "Remove Successfully!",
+        });
       } catch (error) {
         next(error);
       }

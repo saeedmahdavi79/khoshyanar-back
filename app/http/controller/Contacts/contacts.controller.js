@@ -1091,6 +1091,237 @@ class ContactController extends Controller {
     }
   }
 
+  async getCustomersInState(req, res, next) {
+    try {
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+
+      const verifyResult = await verifyAccessToken(token);
+      const user = await UserModel.findOne({ phone: verifyResult.phone });
+
+      const getFyYear = await FYModel.findOne({
+        adminId: user._id,
+        activeYear: "active",
+      });
+
+      const eastAzerbaijan = await CustomersModel.find({
+        state: "آذربايجان شرقی",
+        administrator: user._id,
+      });
+
+      const westAzerbaijan = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "آذربايجان غربی",
+      });
+      const ardabil = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "اردبیل",
+      });
+      const isfahan = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "اصفهان",
+      });
+      const ilam = await CustomersModel.find({
+        state: "ایلام",
+        administrator: user._id,
+      });
+      const bushehr = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "بوشهر",
+      });
+      const tehran = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "تهران",
+      });
+      const chaharmahalandBakhtiari = await CustomersModel.find({
+        administrator: user._id,
+        year: getFyYear.fyValue,
+        state: "چهارمحال بختیاری",
+      });
+      const khorasanj = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "خراسان جنوبی",
+      });
+      const khorasanr = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "خراسان رضوی",
+      });
+      const khorasans = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "خراسان شمالی",
+      });
+
+      const khoozestan = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "خوزستان",
+      });
+
+      const zanjan = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "زنجان",
+      });
+
+      const semnan = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "سمنان",
+      });
+
+      const baluch = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "سيستان و بلوچستان",
+      });
+
+      const fars = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "فارس",
+      });
+
+      const qazvin = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "قزوين",
+      });
+
+      const qom = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "قم",
+      });
+
+      const alborz = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "البرز",
+      });
+
+      const kurd = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "كردستان",
+      });
+
+      const kerman = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "کرمان",
+      });
+
+      const kermanshah = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "كرمانشاه",
+      });
+
+      const buyerahmad = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "كهكيلويه و بويراحمد",
+      });
+
+      const golestan = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "گلستان",
+      });
+
+      const gilan = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "گيلان",
+      });
+
+      const lorestan = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "لرستان",
+      });
+
+      const mazandaran = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "مازندران",
+      });
+
+      const markazi = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "مرکزی",
+      });
+
+      const hormozgan = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "هرمزگان",
+      });
+
+      const hamedan = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "همدان",
+      });
+
+      const yazd = await CustomersModel.find({
+        administrator: user._id,
+
+        state: "يزد",
+      });
+
+      res.status(200).json({
+        status: 200,
+        message: "تعداد مشتریان در استان ها دریافت شدند",
+        data: {
+          ardabil: ardabil.length,
+          isfahan: isfahan.length,
+          alborz: alborz.length,
+          ilam: ilam.length,
+          eastAzerbaijan: eastAzerbaijan.length,
+          westAzerbaijan: westAzerbaijan.length,
+          bushehr: bushehr.length,
+          tehran: tehran.length,
+          chaharmahalandBakhtiari: chaharmahalandBakhtiari.length,
+          southKhorasan: khorasanj.length,
+          razaviKhorasan: khorasanr.length,
+          northKhorasan: khorasans.length,
+          khuzestan: khoozestan.length,
+          zanjan: zanjan.length,
+          semnan: semnan.length,
+          sistanAndBaluchestan: baluch.length,
+          fars: fars.length,
+          qazvin: qazvin.length,
+          qom: qom.length,
+          kurdistan: kurd.length,
+          kerman: kerman.length,
+          kohgiluyehAndBoyerAhmad: buyerahmad.lenght,
+          kermanshah: kermanshah.length,
+          golestan: golestan.length,
+          gilan: gilan.length,
+          lorestan: lorestan.length,
+          mazandaran: mazandaran.length,
+          markazi: markazi.length,
+          hormozgan: hormozgan.length,
+          hamadan: hamedan.length,
+          yazd: yazd.length,
+        },
+        createDate: new Date().toLocaleDateString("fa-ir"),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getGhardesh(req, res, next) {
     try {
       const { tokenTakro, code } = req.body;

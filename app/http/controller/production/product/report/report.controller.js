@@ -122,6 +122,86 @@ class ProductReportController extends Controller {
     }
   }
 
+  async getCountOLetters(req, res, next) {
+    try {
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+
+      const verifyResult = await verifyAccessToken(token);
+      const user = await UserModel.findOne({
+        phone: verifyResult.phone,
+      });
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      let DataUser;
+
+      if (user) {
+        DataUser = user._id;
+      }
+
+      if (userPersonel) {
+        DataUser = userPersonel.adminUser;
+      }
+
+      const dataGet = (
+        await LetterModel.find({
+          adminUser: DataUser,
+        })
+      ).length;
+
+      res.status(200).json({
+        status: 200,
+        message: "اطلاعات دریافت شد",
+        data: dataGet,
+        createDate: new Date().toLocaleDateString("fa-ir"),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCountOLeaves(req, res, next) {
+    try {
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+
+      const verifyResult = await verifyAccessToken(token);
+      const user = await UserModel.findOne({
+        phone: verifyResult.phone,
+      });
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      let DataUser;
+
+      if (user) {
+        DataUser = user._id;
+      }
+
+      if (userPersonel) {
+        DataUser = userPersonel.adminUser;
+      }
+
+      const dataGet = (
+        await LeaveModel.find({
+          adminUser: DataUser,
+        })
+      ).length;
+
+      res.status(200).json({
+        status: 200,
+        message: "اطلاعات دریافت شد",
+        data: dataGet,
+        createDate: new Date().toLocaleDateString("fa-ir"),
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getCountOfCategory(req, res, next) {
     try {
       const authorization = req.headers.authorization;
@@ -387,7 +467,7 @@ class ProductReportController extends Controller {
       next(error);
     }
   }
-  
+
   async getProductInMonth(req, res, next) {
     try {
       const authorization = req.headers.authorization;

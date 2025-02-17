@@ -429,11 +429,12 @@ const {
 //  *              description: Internal Server Error
 //  */
 
-router.post("/create",  LeadController.createLead);
+router.post("/create", LeadController.createLead);
 router.post("/get-lead-by-id", bearerTokenVisitor, LeadController.getLeadById);
 router.post("/get-lead-by-id-admin", bearerToken, LeadController.getLeadById);
 router.post("/trendyol", LeadController.getDataFromTrendYol);
 router.post("/hepsi", LeadController.getDataFromHepsi);
+router.post("/create-contract", LeadController.createContract);
 
 router.get("/getAll", LeadController.getAllLeads);
 router.get("/get-leads-count", LeadController.getCountOfLeads);
@@ -448,13 +449,16 @@ router.get(
   bearerToken,
   LeadController.getAllLeadsOfAdminUser
 );
+router.get("/get-contracts", LeadController.getAllContracts);
 
 router.get("/get-leads-month", bearerToken, LeadController.getLeadsInMonth);
 
 router.put("/edit-lead-admin", bearerToken, LeadController.editLead);
+router.put("/edit-contract", LeadController.editContract);
 
 router.put("/edit-lead-visitor", bearerTokenVisitor, LeadController.editLead);
-router.delete("/remove",  LeadController.removeLeads);
+router.delete("/remove", LeadController.removeLeads);
+router.delete("/remove-contract", LeadController.removeContract);
 
 // router.delete("/remove", CategoryController.removeCat);
 module.exports = {
