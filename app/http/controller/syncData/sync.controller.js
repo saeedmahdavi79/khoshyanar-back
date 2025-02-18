@@ -201,6 +201,7 @@ async getProductsSync(req, res, next) {
           phone: verifyResult.phone,
       });
 
+console.log(tokenTakro);
 
         const fetchData = await fetch(baseUrl(`/services/Base/ApiService/GetGoodsInfo?FiscalYear=1403&MaxResultCount=1000000&StoreId=104`), {
           method: "GET",
