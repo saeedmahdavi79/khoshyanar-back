@@ -14,6 +14,7 @@ var shamsi = require("shamsi-date-converter");
 const randomUsernameGenerator = require("random-username-generator");
 const { baseUrl } = require("../../../utils/baseUrl");
 const { OrdersModel } = require("../../../models/contact/orders.model");
+const { NotifModel } = require("../../../models/notfication/notfication.model");
 
 //Public Class
 class ContactController extends Controller {
@@ -881,7 +882,7 @@ class ContactController extends Controller {
   }
 
   async addOrder(req, res, next) {
-    const { products, title } = req.body; // products باید یک آرایه از اشیاء باشد
+    const { products, title, id } = req.body; // products باید یک آرایه از اشیاء باشد
     try {
       const authorization = req.headers.authorization;
       const [bearer, token] = authorization.split(" ");
@@ -919,19 +920,77 @@ class ContactController extends Controller {
           month: shamsi.gregorianToJalali(new Date())[1],
           year: shamsi.gregorianToJalali(new Date())[0],
         });
+
+        const createNotif = await NotifModel.create({
+          nameElan: `سفارش توسط ${
+            user.name + " " + user.lastName
+          } در سیستم ثبت شد`,
+          contentElan: `سفارش توسط ${
+            user.name + " " + user.lastName
+          } در سیستم ثبت شد`,
+          status: "true",
+          adminUser: user._id,
+          adminUserName: user.name + " " + user.lastName,
+        });
       }
 
       if (userPersonel) {
-        const addOrder = await OrdersModel.create({
-          products,
-          adminId: userPersonel._id,
-          adminName: userPersonel.name + " " + userPersonel.lastName,
-          title,
+        if (id) {
+          const userPersonelAddedOrder = await CustomersModel.findOne({
+            _id: id,
+          });
+          const addOrder = await OrdersModel.create({
+            products,
+            adminId: userPersonelAddedOrder._id,
+            adminName: userPersonelAddedOrder.name,
+            title,
+            creatorName: !user
+              ? userPersonel.name + " " + userPersonel.lastName
+              : user.name + " " + user.lastName,
+            code: randId,
+            month: shamsi.gregorianToJalali(new Date())[1],
+            year: shamsi.gregorianToJalali(new Date())[0],
+          });
 
-          code: randId,
-          month: shamsi.gregorianToJalali(new Date())[1],
-          year: shamsi.gregorianToJalali(new Date())[0],
-        });
+          const createNotif = await NotifModel.create({
+            nameElan: `سفارش توسط ${
+              !user
+                ? userPersonel.name + " " + userPersonel.lastName
+                : user.name + " " + user.lastName
+            } در سیستم ثبت شد`,
+            contentElan: `سفارش توسط ${
+              !user
+                ? userPersonel.name + " " + userPersonel.lastName
+                : user.name + " " + user.lastName
+            } در سیستم ثبت شد`,
+            status: "true",
+            adminUser: userPersonel.adminUser,
+            adminUserName: userPersonel.name,
+          });
+        } else {
+          const addOrder = await OrdersModel.create({
+            products,
+            adminId: userPersonel._id,
+            adminName: userPersonel.name + " " + userPersonel.lastName,
+            title,
+
+            code: randId,
+            month: shamsi.gregorianToJalali(new Date())[1],
+            year: shamsi.gregorianToJalali(new Date())[0],
+          });
+
+          const createNotif = await NotifModel.create({
+            nameElan: `سفارش توسط ${
+              userPersonel.name + " " + userPersonel.lastName
+            } در سیستم ثبت شد`,
+            contentElan: `سفارش توسط ${
+              userPersonel.name + " " + userPersonel.lastName
+            } در سیستم ثبت شد`,
+            status: "true",
+            adminUser: userPersonel.adminUser,
+            adminUserName: userPersonel.name + " " + userPersonel.lastName,
+          });
+        }
       }
 
       if (userCustomer) {
@@ -944,6 +1003,18 @@ class ContactController extends Controller {
           code: randId,
           month: shamsi.gregorianToJalali(new Date())[1],
           year: shamsi.gregorianToJalali(new Date())[0],
+        });
+
+        const createNotif = await NotifModel.create({
+          nameElan: `سفارش توسط ${
+            userCustomer.name + " " + userCustomer.lastName
+          } در سیستم ثبت شد`,
+          contentElan: `سفارش توسط ${
+            userCustomer.name + " " + userCustomer.lastName
+          } در سیستم ثبت شد`,
+          status: "true",
+          adminUser: userCustomer.adminUser,
+          adminUserName: userCustomer.name + " " + userPersonel.lastName,
         });
       }
 

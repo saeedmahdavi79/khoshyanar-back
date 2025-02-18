@@ -16,6 +16,7 @@ const { body } = require("express-validator");
 const OrganizitonChartModel = require("../../../models/orgChart/orgChart");
 
 const { default: slugify } = require("slugify");
+const { NotifModel } = require("../../../models/notfication/notfication.model");
 
 //Public Class
 class OfficeController extends Controller {
@@ -45,6 +46,18 @@ class OfficeController extends Controller {
             requesterId: user._id,
             adminUser: user._id,
           });
+
+          const createNotif = await NotifModel.create({
+            nameElan: `درخواست مرخصی توسط ${
+              user.name + " " + user.lastName
+            } در سیستم ثبت شد`,
+            contentElan: `درخواست مرخصی توسط ${
+              user.name + " " + user.lastName
+            } در سیستم ثبت شد`,
+            status: "true",
+            adminUser: user._id,
+            adminUserName: user.name + " " + user.lastName,
+          });
         }
 
         if (userPersonel) {
@@ -56,6 +69,17 @@ class OfficeController extends Controller {
             type,
             requesterId: userPersonel._id,
             adminUser: userPersonel.adminUser,
+          });
+          const createNotif = await NotifModel.create({
+            nameElan: `درخواست مرخصی توسط ${
+              userPersonel.name + " " + userPersonel.lastName
+            } در سیستم ثبت شد`,
+            contentElan: `درخواست مرخصی توسط ${
+              userPersonel.name + " " + userPersonel.lastName
+            } در سیستم ثبت شد`,
+            status: "true",
+            adminUser: userPersonel.adminUser,
+            adminUserName: userPersonel.name + " " + userPersonel.lastName,
           });
         }
 
@@ -730,6 +754,17 @@ class OfficeController extends Controller {
             adminUser: user._id,
             adminUserName: user.name + " " + user.lastName,
           });
+          const createNotif = await NotifModel.create({
+            nameElan: `مکاتبه توسط ${
+              user.name + " " + user.lastName
+            } در سیستم ثبت شد`,
+            contentElan: `مکاتبه توسط ${
+              user.name + " " + user.lastName
+            } در سیستم ثبت شد`,
+            status: "true",
+            adminUser: user._id,
+            adminUserName: user.name + " " + user.lastName,
+          });
         }
         if (userPersonel) {
           const createLetter = await LetterModel.create({
@@ -744,6 +779,17 @@ class OfficeController extends Controller {
             day: shamsi.gregorianToJalali(new Date())[2],
             content,
             adminUser: userPersonel._id,
+            adminUserName: userPersonel.name + " " + userPersonel.lastName,
+          });
+          const createNotif = await NotifModel.create({
+            nameElan: `مکاتبه توسط ${
+              userPersonel.name + " " + userPersonel.lastName
+            } در سیستم ثبت شد`,
+            contentElan: `مکاتبه توسط ${
+              userPersonel.name + " " + userPersonel.lastName
+            } در سیستم ثبت شد`,
+            status: "true",
+            adminUser: userPersonel.adminUser,
             adminUserName: userPersonel.name + " " + userPersonel.lastName,
           });
         }
@@ -852,10 +898,10 @@ class OfficeController extends Controller {
         // if (user) {
         //   // If user exists, fetch data using user._id
         dataGet = (await LetterModel.find()).reverse();
-        if(userPersonel){
+        if (userPersonel) {
           dataGet2 = (
-                   await LetterModel.find({ adminUser: userPersonel._id })
-                 ).reverse();
+            await LetterModel.find({ adminUser: userPersonel._id })
+          ).reverse();
         }
         // }
 
@@ -881,7 +927,7 @@ class OfficeController extends Controller {
         filteredData = filterByReceiverId(dataGet, userPersonel._id.toString());
 
         // Merge the results
-        const mergedData = [...dataGet2,...filteredData];
+        const mergedData = [...dataGet2, ...filteredData];
 
         // Send response
         res.status(202).json({

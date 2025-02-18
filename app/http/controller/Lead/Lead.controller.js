@@ -14,6 +14,7 @@ const cheerio = require("cheerio");
 const { chromium } = require("playwright");
 const url = require("url");
 const { UserPersonelModel } = require("../../../models/users/users.model");
+const { ContractModel } = require("../../../models/contract/contract.model");
 
 //const puppeteer = require("puppeteer");
 

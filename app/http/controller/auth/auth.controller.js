@@ -706,18 +706,14 @@ class UserController extends Controller {
       let dataGet = [];
 
       if (user) {
-        dataGet = (
-          await NotifModel.find({
-            adminUser: user._id,
-          })
-        ).reverse();
+        dataGet = await NotifModel.find({
+          adminUser: user._id,
+        });
       }
       if (userLast) {
-        dataGet = (
-          await NotifModel.find({
-            adminUser: userLast.adminUser,
-          })
-        ).reverse();
+        dataGet = await NotifModel.find({
+          adminUser: userLast.adminUser,
+        });
       }
 
       res.status(200).json({

@@ -9,6 +9,7 @@ const OrdersDataSchema = new Schema({
   status: { type: String, default: "false" },
   statusOp: { type: String, default: "false" },
   statusOpUser: { type: String, default: "-" },
+  creatorName: { type: String },
 
   code: { type: String },
   month: { type: String },
