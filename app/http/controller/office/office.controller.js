@@ -691,7 +691,7 @@ class OfficeController extends Controller {
 
   async createLetter(req, res, next) {
     try {
-      const { subject, zonkan, recivers, doc, content } = req.body;
+      const { subject, zonkan, isSignNeed, recivers, doc, content } = req.body;
 
       try {
         const authorization = req.headers.authorization;
@@ -699,6 +699,10 @@ class OfficeController extends Controller {
 
         const verifyResult = await verifyAccessToken(token);
         const user = await UserModel.findOne({
+          phone: verifyResult.phone,
+        });
+
+        const userPersonel = await UserPersonelModel.findOne({
           phone: verifyResult.phone,
         });
 
@@ -711,19 +715,39 @@ class OfficeController extends Controller {
 
         const randId = getRandomInteger(10000, 99999);
 
-        const createLetter = await LetterModel.create({
-          subject,
-          zonkan,
-          recivers,
-          doc,
-          number: randId,
-          month: shamsi.gregorianToJalali(new Date())[1],
-          year: shamsi.gregorianToJalali(new Date())[0],
-          day: shamsi.gregorianToJalali(new Date())[2],
-          content,
-          adminUser: user._id,
-          adminUserName: user.name + " " + user.lastName,
-        });
+        if (user) {
+          const createLetter = await LetterModel.create({
+            subject,
+            zonkan,
+            recivers,
+            doc,
+            isSignNeed,
+            number: randId,
+            month: shamsi.gregorianToJalali(new Date())[1],
+            year: shamsi.gregorianToJalali(new Date())[0],
+            day: shamsi.gregorianToJalali(new Date())[2],
+            content,
+            adminUser: user._id,
+            adminUserName: user.name + " " + user.lastName,
+          });
+        }
+        if (userPersonel) {
+          const createLetter = await LetterModel.create({
+            subject,
+            zonkan,
+            recivers,
+            doc,
+            isSignNeed,
+            number: randId,
+            month: shamsi.gregorianToJalali(new Date())[1],
+            year: shamsi.gregorianToJalali(new Date())[0],
+            day: shamsi.gregorianToJalali(new Date())[2],
+            content,
+            adminUser: userPersonel._id,
+            adminUserName: userPersonel.name + " " + userPersonel.lastName,
+          });
+        }
+
         res.status(202).json({
           status: 202,
           message: `نامه ثبت شد`,
@@ -760,21 +784,19 @@ class OfficeController extends Controller {
         // Check if user exists
         if (user) {
           // If user exists, fetch data using user._id
-          dataGet = (
-            await LetterModel.find({
-              adminUser: user._id,
-            })
-          ).reverse();
+          dataGet = (await LetterModel.find()).reverse();
         }
 
         // Check if userPersonel exists
         if (userPersonel) {
           // If userPersonel exists, fetch data using userPersonel.adminUser
-          dataGet2 = (
-            await LetterModel.find({
-              adminUser: userPersonel.adminUser,
-            })
-          ).reverse();
+          if (userPersonel.access == "1" || userPersonel.access == "2") {
+            dataGet2 = (await LetterModel.find()).reverse();
+          } else {
+            dataGet2 = (
+              await LetterModel.find({ adminUser: userPersonel._id })
+            ).reverse();
+          }
 
           function filterByReceiverId(dataArray, receiverId) {
             return dataArray.filter((item) =>
@@ -789,7 +811,72 @@ class OfficeController extends Controller {
         }
 
         // Merge the results
-        const mergedData = [...dataGet, ...filteredData];
+        const mergedData = [...dataGet, ...dataGet2, ...filteredData];
+
+        // Send response
+        res.status(202).json({
+          status: 202,
+          data: { mergedData },
+          message: ` زونکن ها دریافت شد`,
+          createDate: new Date(),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getLettersMe(req, res, next) {
+    try {
+      try {
+        const authorization = req.headers.authorization;
+        const [bearer, token] = authorization.split(" ");
+
+        const verifyResult = await verifyAccessToken(token);
+
+        const user = await UserModel.findOne({
+          phone: verifyResult.phone,
+        });
+
+        const userPersonel = await UserPersonelModel.findOne({
+          phone: verifyResult.phone,
+        });
+
+        // Initialize arrays for data
+        let dataGet = [];
+        let dataGet2 = [];
+        let filteredData = [];
+        // Check if user exists
+        // if (user) {
+        //   // If user exists, fetch data using user._id
+        dataGet = (await LetterModel.find()).reverse();
+        // }
+
+        // // Check if userPersonel exists
+        // if (userPersonel) {
+        //   // If userPersonel exists, fetch data using userPersonel.adminUser
+        //   if (userPersonel.access == "1" || userPersonel.access == "2") {
+        //     dataGet2 = (await LetterModel.find()).reverse();
+        //   } else {
+        //     dataGet2 = (
+        //       await LetterModel.find({ adminUser: userPersonel._id })
+        //     ).reverse();
+        //   }
+
+        // }
+
+        function filterByReceiverId(dataArray, receiverId) {
+          return dataArray.filter((item) =>
+            item.recivers.some((id) => id === receiverId)
+          );
+        }
+
+        filteredData = filterByReceiverId(dataGet, userPersonel._id.toString());
+
+        // Merge the results
+        const mergedData = [...filteredData];
 
         // Send response
         res.status(202).json({

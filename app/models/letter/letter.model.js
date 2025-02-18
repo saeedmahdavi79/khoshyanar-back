@@ -11,6 +11,8 @@ const LetterSchema = new Schema({
   status: { type: String, default: "false" },
   adminUser: { type: String },
   adminUserName: { type: String },
+  isSignNeed: { type: String, default: "0" },
+
   day: { type: String },
   month: { type: String },
   year: { type: String },

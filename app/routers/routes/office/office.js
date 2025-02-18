@@ -389,6 +389,7 @@ router.get(
   bearerToken,
   ProductReportController.getCountOLetters
 );
+router.get("/get-letters-me", bearerToken, OfficeController.getLettersMe);
 router.get(
   "/get-leaves-Count",
   bearerToken,
