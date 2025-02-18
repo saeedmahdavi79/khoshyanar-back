@@ -475,6 +475,7 @@ class ContactController extends Controller {
         lat,
         phone,
         des,
+        tokenTak,
       } = req.body;
 
       try {
@@ -499,74 +500,105 @@ class ContactController extends Controller {
 
         const randId = getRandomInteger(10000, 99999);
         const hashedPassword = await sha256pass("123456");
-        if (user) {
-          const createContact = await CustomersModel.create({
-            name,
-            perName,
-            financialCode,
-            conName,
-            conDes,
-            birthDate,
-            nationalCode,
-            state,
-            city,
-            address,
-            postalCode,
-            workType,
-            relationType,
-            countOfPersonel,
-            ownerShip,
-            connection,
-            type,
-            coType,
-            sabtNumber,
-            buissCode,
-            lon,
-            lat,
-            phone,
-            userName,
-            des,
-            password: randId,
-            adminUser: user._id,
-            adminUserName: user.name + " " + user.lastName,
-            month: shamsi.gregorianToJalali(new Date())[1],
-            year: shamsi.gregorianToJalali(new Date())[0],
-            day: shamsi.gregorianToJalali(new Date())[2],
-          });
-        }
-        if (userPersonel) {
-          const createContact = await CustomersModel.create({
-            name,
-            perName,
-            financialCode,
-            conName,
-            conDes,
-            birthDate,
-            nationalCode,
-            state,
-            city,
-            address,
-            postalCode,
-            workType,
-            relationType,
-            countOfPersonel,
-            ownerShip,
-            connection,
-            type,
-            coType,
-            sabtNumber,
-            buissCode,
-            lon,
-            lat,
-            phone,
-            des,
-            userName,
-            password: randId,
-            adminUser: userPersonel._id,
-            adminUserName: userPersonel.name + " " + userPersonel.lastName,
-            month: shamsi.gregorianToJalali(new Date())[1],
-            year: shamsi.gregorianToJalali(new Date())[0],
-            day: shamsi.gregorianToJalali(new Date())[2],
+
+        const fetchDataMande = await fetch(
+          baseUrl(`/services/Base/ApiService/CreateOrUpdateAcntCode`),
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${tokenTak}`,
+              "Content-Type": "application/json",
+              "Abp.TenantId": "1",
+            },
+            body: JSON.stringify({
+              fiscalYear: shamsi.gregorianToJalali(new Date())[0],
+              birthDate: birthDate,
+              firstName: name,
+              lastName: "",
+              fullName: name,
+              id: randId.toString(),
+            }),
+          }
+        );
+
+        const responseDataMande = await fetchDataMande.json();
+
+        if (responseDataMande.success == true) {
+          if (user) {
+            const createContact = await CustomersModel.create({
+              name,
+              perName,
+              financialCode,
+              conName,
+              conDes,
+              birthDate,
+              nationalCode,
+              state,
+              city,
+              address,
+              postalCode,
+              workType,
+              relationType,
+              countOfPersonel,
+              ownerShip,
+              connection,
+              type,
+              coType,
+              sabtNumber,
+              buissCode,
+              lon,
+              lat,
+              phone,
+              userName,
+              des,
+              password: randId,
+              adminUser: user._id,
+              adminUserName: user.name + " " + user.lastName,
+              month: shamsi.gregorianToJalali(new Date())[1],
+              year: shamsi.gregorianToJalali(new Date())[0],
+              day: shamsi.gregorianToJalali(new Date())[2],
+            });
+          }
+          if (userPersonel) {
+            const createContact = await CustomersModel.create({
+              name,
+              perName,
+              financialCode,
+              conName,
+              conDes,
+              birthDate,
+              nationalCode,
+              state,
+              city,
+              address,
+              postalCode,
+              workType,
+              relationType,
+              countOfPersonel,
+              ownerShip,
+              connection,
+              type,
+              coType,
+              sabtNumber,
+              buissCode,
+              lon,
+              lat,
+              phone,
+              des,
+              userName,
+              password: randId,
+              adminUser: userPersonel._id,
+              adminUserName: userPersonel.name + " " + userPersonel.lastName,
+              month: shamsi.gregorianToJalali(new Date())[1],
+              year: shamsi.gregorianToJalali(new Date())[0],
+              day: shamsi.gregorianToJalali(new Date())[2],
+            });
+          }
+        } else {
+          res.status(500).json({
+            status: 500,
+            message: ` مشکل در سرور تکرو سیستم`,
+            createDate: new Date().toLocaleDateString("fa-ir"),
           });
         }
 
