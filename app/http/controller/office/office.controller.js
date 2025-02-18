@@ -852,6 +852,11 @@ class OfficeController extends Controller {
         // if (user) {
         //   // If user exists, fetch data using user._id
         dataGet = (await LetterModel.find()).reverse();
+        if(userPersonel){
+          dataGet2 = (
+                   await LetterModel.find({ adminUser: userPersonel._id })
+                 ).reverse();
+        }
         // }
 
         // // Check if userPersonel exists
@@ -876,7 +881,7 @@ class OfficeController extends Controller {
         filteredData = filterByReceiverId(dataGet, userPersonel._id.toString());
 
         // Merge the results
-        const mergedData = [...filteredData];
+        const mergedData = [...dataGet2,...filteredData];
 
         // Send response
         res.status(202).json({
