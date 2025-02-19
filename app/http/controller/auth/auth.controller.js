@@ -259,6 +259,13 @@ class UserController extends Controller {
           requestDate: new Date().toLocaleDateString("fa-ir"),
         });
       }
+
+      return res.status(400).json({
+        status: 400,
+
+        message: "Faild!",
+        requestDate: new Date().toLocaleDateString("fa-ir"),
+      });
     } catch (error) {
       next(error);
     }

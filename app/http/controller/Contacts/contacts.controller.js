@@ -529,7 +529,7 @@ class ContactController extends Controller {
             const createContact = await CustomersModel.create({
               name,
               perName,
-              financialCode,
+              financialCode: responseDataMande.result,
               conName,
               conDes,
               birthDate,
@@ -564,7 +564,7 @@ class ContactController extends Controller {
             const createContact = await CustomersModel.create({
               name,
               perName,
-              financialCode,
+              financialCode: responseDataMande.result,
               conName,
               conDes,
               birthDate,

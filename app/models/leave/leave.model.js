@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const LeaveSchema = new Schema({
   requesterName: { type: String },
   date: { type: String },
+  startDate: { type: String },
   length: { type: String },
   des: { type: String },
   adminUser: { type: String },

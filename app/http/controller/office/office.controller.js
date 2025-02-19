@@ -22,7 +22,7 @@ const { NotifModel } = require("../../../models/notfication/notfication.model");
 class OfficeController extends Controller {
   async createLeave(req, res, next) {
     try {
-      const { length, des, type } = req.body;
+      const { length, des, startDate, type } = req.body;
 
       try {
         const authorization = req.headers.authorization;
@@ -43,6 +43,7 @@ class OfficeController extends Controller {
             length,
             des,
             type,
+            startDate,
             requesterId: user._id,
             adminUser: user._id,
           });
@@ -67,6 +68,7 @@ class OfficeController extends Controller {
             length,
             des,
             type,
+            startDate,
             requesterId: userPersonel._id,
             adminUser: userPersonel.adminUser,
           });
