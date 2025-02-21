@@ -403,14 +403,24 @@ router.post(
   bearerToken,
   ContactController.getCustomersMandeAndScore
 );
-router.get("/get-customers-state", ContactController.getCustomersInState);
 
 router.post("/add-order", ContactController.addOrder);
+router.post("/add-buy-broker", ContactController.addBuyBroker);
+router.post(
+  "/confirm-order-broker",
+  bearerToken,
+  ContactController.orderAdminConfirmBroker
+);
 router.post("/confirm-order", bearerToken, ContactController.orderAdminConfirm);
 router.post(
   "/confirm-order-operator",
   bearerToken,
   ContactController.orderOpConfirm
+);
+router.post(
+  "/confirm-order-operator-manage",
+  bearerToken,
+  ContactController.orderOpManageConfirm
 );
 
 router.post("/get-gardesh", bearerToken, ContactController.getGhardesh);
@@ -434,6 +444,8 @@ router.put(
   bearerToken,
   ContactController.transferCustomer
 );
+router.get("/get-customers-state", ContactController.getCustomersInState);
+router.get("/get-buy-broker", ContactController.getBuyBroker);
 
 router.get(
   "/get-visitors-contacts",

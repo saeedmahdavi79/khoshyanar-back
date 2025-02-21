@@ -334,12 +334,24 @@ class UserController extends Controller {
 
           if (userPersonel.signStatus == "1") {
             if (userPersonel.signCode == signCode) {
-              return res.status(200).json({
-                status: 200,
-                thatsOp: true,
-                message: "صاحب امضا و کد احراز شد",
-                requestDate: new Date().toLocaleDateString("fa-ir"),
-              });
+              if (userPersonel.signRole == "1") {
+                return res.status(200).json({
+                  status: 200,
+                  thatsOp: true,
+                  thatsOpSarparast: true,
+                  message: "صاحب امضا و کد احراز شد",
+                  requestDate: new Date().toLocaleDateString("fa-ir"),
+                });
+              }
+              if (userPersonel.signRole == "2") {
+                return res.status(200).json({
+                  status: 200,
+                  thatsOp: true,
+                  thatsOpModir: true,
+                  message: "صاحب امضا و کد احراز شد",
+                  requestDate: new Date().toLocaleDateString("fa-ir"),
+                });
+              }
             } else {
               return res.status(404).json({
                 status: 404,
@@ -367,6 +379,41 @@ class UserController extends Controller {
       }
     } catch (error) {
       next(error);
+    }
+  }
+
+  async createSignImage(req, res, next) {
+    try {
+      const { signImage } = req.body;
+
+      try {
+        const authorization = req.headers.authorization;
+        const [bearer, token] = authorization.split(" ");
+
+        const verifyResult = await verifyAccessToken(token);
+        const user = await UserModel.findOne({
+          phone: verifyResult.phone,
+        });
+
+        if (user) {
+          const createLeave = await UserModel.findOneAndUpdate(
+            { _id: user._id },
+            {
+              signImage,
+            }
+          );
+        }
+
+        res.status(202).json({
+          status: 202,
+          message: ` درخواست حق امضا ثبت شد`,
+          createDate: new Date(),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
     }
   }
 

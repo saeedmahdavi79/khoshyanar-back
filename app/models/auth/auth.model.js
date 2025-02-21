@@ -31,6 +31,7 @@ const UsersSchema = new Schema({
   adminId: { type: String },
   access: { type: String },
   signCode: { type: String },
+  signImage: { type: String },
 
   type: { type: String },
   activePackage: { type: String },
