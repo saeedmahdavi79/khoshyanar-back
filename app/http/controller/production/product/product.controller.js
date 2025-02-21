@@ -14,7 +14,9 @@ const {
 const {
   HavaleAzAnbarModel,
 } = require("../../../../models/production/product/havaleAzAnbar.model");
-const { CustomersModel } = require("../../../../models/customers/customers.model");
+const {
+  CustomersModel,
+} = require("../../../../models/customers/customers.model");
 
 //Public Class
 class ProductController extends Controller {
@@ -134,7 +136,7 @@ class ProductController extends Controller {
           sourceName,
           code,
           parent,
-          price
+          price,
         }
       );
 
@@ -719,7 +721,7 @@ class ProductController extends Controller {
     const [bearer, token] = authorization.split(" ");
 
     const verifyResult = await verifyAccessToken(token);
-   
+
     const user = await UserModel.findOne({
       phone: verifyResult.phone,
     });
@@ -731,28 +733,23 @@ class ProductController extends Controller {
       _id: verifyResult.userID,
     });
 
-    
-
     let dataGet = [];
 
     if (user) {
-      (dataGet = await ProductModel.find({
+      dataGet = await ProductModel.find({
         adminUser: user._id,
-       
-      }));
+      });
     }
     if (userPersonel) {
-      (dataGet = await ProductModel.find({
+      dataGet = await ProductModel.find({
         adminUser: userPersonel.adminUser,
-      
-      }));
+      });
     }
 
-    if(userCustomer){
-      (dataGet = await ProductModel.find({
-        adminUser: userCustomer.adminUser,
-      
-      }));
+    if (userCustomer) {
+      dataGet = await ProductModel.find({
+        adminUser: userCustomer.administrator,
+      });
     }
     return dataGet;
   }

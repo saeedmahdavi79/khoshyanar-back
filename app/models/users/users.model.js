@@ -16,6 +16,8 @@ const UserPersonelSchema = new Schema({
   access: { type: String },
   signCode: { type: String },
   signStatus: { type: String },
+  signRole: { type: String },
+  signImage: { type: String },
   adminUser: { type: String },
   adminUserName: { type: String },
   activePlan: { type: String },

@@ -178,6 +178,7 @@ router.post("/create-notif", UserController.createNotif);
 router.post("/create-chart", ChartController.createChart);
 router.post("/create-message", UserController.createChat);
 router.post("/get-message", UserController.getChats);
+router.post("/create-sign-image", UserController.createSignImage);
 
 router.get("/get-user-sign", UserController.getUserSignCode);
 router.get("/get-notif", UserController.getNotifs);

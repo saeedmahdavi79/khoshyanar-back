@@ -371,6 +371,11 @@ router.post("/create-zonkan", bearerToken, OfficeController.createZonkan);
 router.post("/create-letter", bearerToken, OfficeController.createLetter);
 router.post("/create-sign", bearerToken, OfficeController.createSign);
 router.post("/create-chart", bearerToken, OfficeController.createChart);
+router.post(
+  "/create-sign-image",
+  bearerToken,
+  OfficeController.createSignImage
+);
 
 //
 router.get("/get-personel", OfficeController.getPersonels);

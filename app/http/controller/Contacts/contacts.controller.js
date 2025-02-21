@@ -15,6 +15,7 @@ const randomUsernameGenerator = require("random-username-generator");
 const { baseUrl } = require("../../../utils/baseUrl");
 const { OrdersModel } = require("../../../models/contact/orders.model");
 const { NotifModel } = require("../../../models/notfication/notfication.model");
+const { BrokerModel } = require("../../../models/broker/broker.model");
 
 //Public Class
 class ContactController extends Controller {
@@ -552,8 +553,10 @@ class ContactController extends Controller {
               phone,
               userName,
               des,
+              access: "7",
               password: randId,
               adminUser: user._id,
+              administrator: user._id,
               adminUserName: user.name + " " + user.lastName,
               month: shamsi.gregorianToJalali(new Date())[1],
               year: shamsi.gregorianToJalali(new Date())[0],
@@ -587,7 +590,9 @@ class ContactController extends Controller {
               phone,
               des,
               userName,
+              access: "7",
               password: randId,
+              administrator: userPersonel.adminUser,
               adminUser: userPersonel._id,
               adminUserName: userPersonel.name + " " + userPersonel.lastName,
               month: shamsi.gregorianToJalali(new Date())[1],
@@ -882,7 +887,7 @@ class ContactController extends Controller {
   }
 
   async addOrder(req, res, next) {
-    const { products, title, id } = req.body; // products باید یک آرایه از اشیاء باشد
+    const { products, title, id, des } = req.body; // products باید یک آرایه از اشیاء باشد
     try {
       const authorization = req.headers.authorization;
       const [bearer, token] = authorization.split(" ");
@@ -915,6 +920,14 @@ class ContactController extends Controller {
           adminId: user._id,
           adminName: user.name + " " + user.lastName,
           title,
+          des,
+
+          buyerName: user.name + " " + user.lastName,
+          nationalCode: "-",
+          address: "-",
+          postalCode: "-",
+          phone: user.phone,
+          buissCode: "-",
 
           code: randId,
           month: shamsi.gregorianToJalali(new Date())[1],
@@ -944,6 +957,17 @@ class ContactController extends Controller {
             adminId: userPersonelAddedOrder._id,
             adminName: userPersonelAddedOrder.name,
             title,
+            des,
+
+            buyerName: !user
+              ? userPersonel.name + " " + userPersonel.lastName
+              : user.name + " " + user.lastName,
+            nationalCode: "-",
+            address: "-",
+            postalCode: "-",
+            phone: !user ? userPersonel.phone : user.phone,
+            buissCode: "-",
+
             creatorName: !user
               ? userPersonel.name + " " + userPersonel.lastName
               : user.name + " " + user.lastName,
@@ -973,7 +997,13 @@ class ContactController extends Controller {
             adminId: userPersonel._id,
             adminName: userPersonel.name + " " + userPersonel.lastName,
             title,
-
+            des,
+            buyerName: userPersonel.name + " " + userPersonel.lastName,
+            nationalCode: "-",
+            address: "-",
+            postalCode: "-",
+            phone: userPersonel.phone,
+            buissCode: "-",
             code: randId,
             month: shamsi.gregorianToJalali(new Date())[1],
             year: shamsi.gregorianToJalali(new Date())[0],
@@ -999,22 +1029,24 @@ class ContactController extends Controller {
           adminId: userCustomer._id,
           adminName: userCustomer.name,
           title,
-
+          des,
+          buyerName: userCustomer.name,
+          nationalCode: userCustomer.nationalCode,
+          address: userCustomer.address,
+          postalCode: userCustomer.postalCode,
+          phone: userCustomer.phone,
+          buissCode: userCustomer.buissCode,
           code: randId,
           month: shamsi.gregorianToJalali(new Date())[1],
           year: shamsi.gregorianToJalali(new Date())[0],
         });
 
         const createNotif = await NotifModel.create({
-          nameElan: `سفارش توسط ${
-            userCustomer.name + " " + userCustomer.lastName
-          } در سیستم ثبت شد`,
-          contentElan: `سفارش توسط ${
-            userCustomer.name + " " + userCustomer.lastName
-          } در سیستم ثبت شد`,
+          nameElan: `سفارش توسط ${userCustomer.name} در سیستم ثبت شد`,
+          contentElan: `سفارش توسط ${userCustomer.name} در سیستم ثبت شد`,
           status: "true",
-          adminUser: userCustomer.adminUser,
-          adminUserName: userCustomer.name + " " + userPersonel.lastName,
+          adminUser: userCustomer.administrator,
+          adminUserName: userCustomer.name,
         });
       }
 
@@ -1022,6 +1054,138 @@ class ContactController extends Controller {
         status: 202,
         message: "اطلاعات بروز شد",
 
+        createDate: new Date().toLocaleDateString("fa-ir"),
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        status: 500,
+        message: "اطلاعات بروز نشد",
+
+        createDate: new Date().toLocaleDateString("fa-ir"),
+      });
+    }
+  }
+
+  async addBuyBroker(req, res, next) {
+    const { products, title } = req.body; // products باید یک آرایه از اشیاء باشد
+    try {
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+
+      const verifyResult = await verifyAccessToken(token);
+      const user = await UserModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      const getRandomInteger = (min, max) => {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+
+        return Math.floor(Math.random() * (max - min)) + min;
+      };
+
+      const randId = getRandomInteger(10000, 99999);
+
+      if (user) {
+        const addOrder = await BrokerModel.create({
+          products,
+          adminId: user._id,
+          adminName: user.name + " " + user.lastName,
+          title,
+
+          code: randId,
+          month: shamsi.gregorianToJalali(new Date())[1],
+          year: shamsi.gregorianToJalali(new Date())[0],
+        });
+
+        const createNotif = await NotifModel.create({
+          nameElan: `درخواست خرید توسط ${
+            user.name + " " + user.lastName
+          } در سیستم ثبت شد`,
+          contentElan: `درخواست خرید توسط ${
+            user.name + " " + user.lastName
+          } در سیستم ثبت شد`,
+          status: "true",
+          adminUser: user._id,
+          adminUserName: user.name + " " + user.lastName,
+        });
+      }
+
+      if (userPersonel) {
+        const addOrder = await BrokerModel.create({
+          products,
+          adminId: userPersonel._id,
+          adminName: userPersonel.name + " " + userPersonel.lastName,
+          title,
+
+          code: randId,
+          month: shamsi.gregorianToJalali(new Date())[1],
+          year: shamsi.gregorianToJalali(new Date())[0],
+        });
+
+        const createNotif = await NotifModel.create({
+          nameElan: `درخواست خرید توسط ${
+            userPersonel.name + " " + userPersonel.lastName
+          } در سیستم ثبت شد`,
+          contentElan: `درخواست خرید توسط ${
+            userPersonel.name + " " + userPersonel.lastName
+          } در سیستم ثبت شد`,
+          status: "true",
+          adminUser: userPersonel.adminUser,
+          adminUserName: userPersonel.name + " " + userPersonel.lastName,
+        });
+      }
+
+      res.status(202).json({
+        status: 202,
+        message: "اطلاعات بروز شد",
+
+        createDate: new Date().toLocaleDateString("fa-ir"),
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        status: 500,
+        message: "اطلاعات بروز نشد",
+
+        createDate: new Date().toLocaleDateString("fa-ir"),
+      });
+    }
+  }
+
+  async getBuyBroker(req, res, next) {
+    try {
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+
+      const verifyResult = await verifyAccessToken(token);
+      const user = await UserModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      let dataGet = [];
+
+      if (user) {
+        dataGet = (await BrokerModel.find()).reverse();
+      }
+
+      if (userPersonel) {
+        dataGet = (await BrokerModel.find()).reverse();
+      }
+
+      res.status(202).json({
+        status: 202,
+        message: "اطلاعات دریافت شد",
+        data: { dataGet },
         createDate: new Date().toLocaleDateString("fa-ir"),
       });
     } catch (error) {
@@ -1064,9 +1228,11 @@ class ContactController extends Controller {
       }
 
       if (userCustomer) {
-        dataGet = await OrdersModel.find({
-          adminId: userCustomer._id,
-        });
+        dataGet = (
+          await OrdersModel.find({
+            adminId: userCustomer._id,
+          })
+        ).reverse();
       }
       res.status(202).json({
         status: 202,
@@ -1085,9 +1251,55 @@ class ContactController extends Controller {
     }
   }
 
+  async orderAdminConfirmBroker(req, res, next) {
+    try {
+      const { _id } = req.body;
+
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+      const verifyResult = await verifyAccessToken(token);
+
+      const user = await UserModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      try {
+        const dataConf = await BrokerModel.findOneAndUpdate(
+          {
+            _id,
+          },
+          {
+            status: "true",
+            statusSignImage: user.signImage,
+          }
+        );
+
+        res.status(202).json({
+          status: 202,
+          message: "اطلاعات بروز شد",
+
+          createDate: new Date().toLocaleDateString("fa-ir"),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async orderAdminConfirm(req, res, next) {
     try {
       const { _id } = req.body;
+
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+      const verifyResult = await verifyAccessToken(token);
+
+      const user = await UserModel.findOne({
+        phone: verifyResult.phone,
+      });
+
       try {
         const dataConf = await OrdersModel.findOneAndUpdate(
           {
@@ -1095,6 +1307,7 @@ class ContactController extends Controller {
           },
           {
             status: "true",
+            statusSignImage: user.signImage,
           }
         );
 
@@ -1132,6 +1345,45 @@ class ContactController extends Controller {
           {
             statusOp: "true",
             statusOpUser: userPersonel.name + " " + userPersonel.lastName,
+            statusOpUserSignImage: userPersonel.signImage,
+          }
+        );
+
+        res.status(202).json({
+          status: 202,
+          message: "اطلاعات بروز شد",
+
+          createDate: new Date().toLocaleDateString("fa-ir"),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async orderOpManageConfirm(req, res, next) {
+    try {
+      const { _id } = req.body;
+
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+      const verifyResult = await verifyAccessToken(token);
+
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      try {
+        const dataConf = await OrdersModel.findOneAndUpdate(
+          {
+            _id,
+          },
+          {
+            statusOpAdmin: "true",
+            statusOpUserAdmin: userPersonel.name + " " + userPersonel.lastName,
+            statusOpUserAdminSignImage: userPersonel.signImage,
           }
         );
 

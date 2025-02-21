@@ -128,7 +128,7 @@ class OfficeController extends Controller {
 
   async createSign(req, res, next) {
     try {
-      const { signStatus, _id } = req.body;
+      const { signStatus, signRole, _id } = req.body;
 
       try {
         const authorization = req.headers.authorization;
@@ -154,6 +154,51 @@ class OfficeController extends Controller {
             {
               signCode,
               signStatus,
+              signRole,
+            }
+          );
+        }
+
+        res.status(202).json({
+          status: 202,
+          message: ` درخواست حق امضا ثبت شد`,
+          createDate: new Date(),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async createSignImage(req, res, next) {
+    try {
+      const { signImage, _id } = req.body;
+
+      try {
+        const authorization = req.headers.authorization;
+        const [bearer, token] = authorization.split(" ");
+
+        const verifyResult = await verifyAccessToken(token);
+        const user = await UserModel.findOne({
+          phone: verifyResult.phone,
+        });
+
+        const getRandomInteger = (min, max) => {
+          min = Math.ceil(min);
+          max = Math.floor(max);
+
+          return Math.floor(Math.random() * (max - min)) + min;
+        };
+
+        const signCode = getRandomInteger(10000, 99999);
+
+        if (user) {
+          const createLeave = await UserPersonelModel.findOneAndUpdate(
+            { _id },
+            {
+              signImage,
             }
           );
         }
