@@ -268,12 +268,20 @@ class OfficeController extends Controller {
           ).reverse();
         }
         if (userPersonel) {
-          dataGet = (
-            await LeaveModel.find({
-              adminUser: userPersonel.adminUser,
-              requesterId: userPersonel._id,
-            })
-          ).reverse();
+          if (userPersonel.access == "1" || userPersonel.access == "2") {
+            dataGet = (
+              await LeaveModel.find({
+                adminUser: userPersonel.adminUser,
+              })
+            ).reverse();
+          } else {
+            dataGet = (
+              await LeaveModel.find({
+                adminUser: userPersonel.adminUser,
+                requesterId: userPersonel._id,
+              })
+            ).reverse();
+          }
         }
 
         res.status(202).json({
