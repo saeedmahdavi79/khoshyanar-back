@@ -476,7 +476,7 @@ class UserController extends Controller {
       }
       if (userCustomer) {
         dataGet = await SettingModel.findOne({
-          adminUser: userCustomer.adminUser,
+          adminUser: userCustomer.administrator,
         });
       }
 

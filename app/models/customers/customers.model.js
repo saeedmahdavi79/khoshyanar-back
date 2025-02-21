@@ -30,6 +30,8 @@ const CustomersSchema = new Schema({
   phone: { type: String },
   des: { type: String },
   id: { type: String },
+  access: { type: String },
+  administrator: { type: String },
 
   adminUser: { type: String },
   adminUserName: { type: String },

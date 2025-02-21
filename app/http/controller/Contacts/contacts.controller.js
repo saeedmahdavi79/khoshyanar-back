@@ -553,8 +553,10 @@ class ContactController extends Controller {
               phone,
               userName,
               des,
+              access: "7",
               password: randId,
               adminUser: user._id,
+              administrator: user._id,
               adminUserName: user.name + " " + user.lastName,
               month: shamsi.gregorianToJalali(new Date())[1],
               year: shamsi.gregorianToJalali(new Date())[0],
@@ -588,7 +590,9 @@ class ContactController extends Controller {
               phone,
               des,
               userName,
+              access: "7",
               password: randId,
+              administrator: userPersonel.adminUser,
               adminUser: userPersonel._id,
               adminUserName: userPersonel.name + " " + userPersonel.lastName,
               month: shamsi.gregorianToJalali(new Date())[1],
@@ -1038,15 +1042,11 @@ class ContactController extends Controller {
         });
 
         const createNotif = await NotifModel.create({
-          nameElan: `سفارش توسط ${
-            userCustomer.name + " " + userCustomer.lastName
-          } در سیستم ثبت شد`,
-          contentElan: `سفارش توسط ${
-            userCustomer.name + " " + userCustomer.lastName
-          } در سیستم ثبت شد`,
+          nameElan: `سفارش توسط ${userCustomer.name} در سیستم ثبت شد`,
+          contentElan: `سفارش توسط ${userCustomer.name} در سیستم ثبت شد`,
           status: "true",
-          adminUser: userCustomer.adminUser,
-          adminUserName: userCustomer.name + " " + userPersonel.lastName,
+          adminUser: userCustomer.administrator,
+          adminUserName: userCustomer.name,
         });
       }
 
@@ -1228,9 +1228,11 @@ class ContactController extends Controller {
       }
 
       if (userCustomer) {
-        dataGet = await OrdersModel.find({
-          adminId: userCustomer._id,
-        });
+        dataGet = (
+          await OrdersModel.find({
+            adminId: userCustomer._id,
+          })
+        ).reverse();
       }
       res.status(202).json({
         status: 202,
