@@ -186,6 +186,119 @@ class ProductController extends Controller {
     return category;
   }
 
+  async orderOpConfirm(req, res, next) {
+    try {
+      const { _id } = req.body;
+
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+      const verifyResult = await verifyAccessToken(token);
+
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      try {
+        const dataConf = await HavaleAzAnbarModel.findOneAndUpdate(
+          {
+            _id,
+          },
+          {
+            statusOp: "true",
+            statusOpUser: userPersonel.name + " " + userPersonel.lastName,
+            statusOpUserSignImage: userPersonel.signImage,
+          }
+        );
+
+        res.status(202).json({
+          status: 202,
+          message: "اطلاعات بروز شد",
+
+          createDate: new Date().toLocaleDateString("fa-ir"),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async orderOpManageConfirm(req, res, next) {
+    try {
+      const { _id } = req.body;
+
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+      const verifyResult = await verifyAccessToken(token);
+
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      try {
+        const dataConf = await HavaleAzAnbarModel.findOneAndUpdate(
+          {
+            _id,
+          },
+          {
+            statusOpAdmin: "true",
+            statusOpUserAdmin: userPersonel.name + " " + userPersonel.lastName,
+            statusOpUserAdminSignImage: userPersonel.signImage,
+          }
+        );
+
+        res.status(202).json({
+          status: 202,
+          message: "اطلاعات بروز شد",
+
+          createDate: new Date().toLocaleDateString("fa-ir"),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async orderOpManageConfirmAnbardar(req, res, next) {
+    try {
+      const { _id } = req.body;
+
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+      const verifyResult = await verifyAccessToken(token);
+
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      try {
+        const dataConf = await HavaleAzAnbarModel.findOneAndUpdate(
+          {
+            _id,
+          },
+          {
+            statusOpAdminAnbardar: "true",
+            statusOpUserAdminAnbardar: userPersonel.name + " " + userPersonel.lastName,
+            statusOpUserAdminSignImageAnbardar: userPersonel.signImage,
+          }
+        );
+
+        res.status(202).json({
+          status: 202,
+          message: "اطلاعات بروز شد",
+
+          createDate: new Date().toLocaleDateString("fa-ir"),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
   async alreadyExistBySlug(slug) {
     const category = await ProductModel.findOne({ slug });
     if (category) throw new createHttpError.Conflict("دسته بندی یافت نشد");
@@ -613,15 +726,19 @@ class ProductController extends Controller {
         let dataGet = [];
 
         if (user) {
-          dataGet = await HavaleAzAnbarModel.find({
-            adminId: user._id,
-          });
+          dataGet = (await HavaleAzAnbarModel.find({
+            
+          })).reverse();
         }
 
         if (userPersonel) {
-          dataGet = await HavaleAzAnbarModel.find({
-            adminId: userPersonel.adminUser,
-          });
+          if(userPersonel.access == "1" || userPersonel.access == "2"){
+            dataGet = (await HavaleAzAnbarModel.find({
+            })).reverse();
+          }else{
+            dataGet = (await HavaleAzAnbarModel.find()).reverse();
+          }
+         
         }
 
         res.status(202).json({
@@ -642,14 +759,43 @@ class ProductController extends Controller {
     try {
       const { _id } = req.body;
       try {
-        const dataConf = await HavaleAzAnbarModel.findOneAndUpdate(
-          {
-            _id,
-          },
-          {
-            status: "true",
-          }
-        );
+      
+        const authorization = req.headers.authorization;
+        const [bearer, token] = authorization.split(" ");
+    
+        const verifyResult = await verifyAccessToken(token);
+    
+        const user = await UserModel.findOne({
+          phone: verifyResult.phone,
+        });
+        const userPersonel = await UserPersonelModel.findOne({
+          phone: verifyResult.phone,
+        });
+
+        if(user){
+          const dataConf = await HavaleAzAnbarModel.findOneAndUpdate(
+            {
+              _id,
+            },
+            {
+              status: "true",
+              statusSignImage: user.signImage,
+            }
+          );
+        }
+        if(userPersonel){
+          const dataConf = await HavaleAzAnbarModel.findOneAndUpdate(
+            {
+              _id,
+            },
+            {
+              status: "true",
+              statusSignImage: userPersonel.signImage,
+            }
+          );
+        }
+       
+       
 
         res.status(202).json({
           status: 202,

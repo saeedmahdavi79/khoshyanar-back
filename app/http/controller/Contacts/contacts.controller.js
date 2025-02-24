@@ -1299,8 +1299,12 @@ class ContactController extends Controller {
       const user = await UserModel.findOne({
         phone: verifyResult.phone,
       });
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
 
       try {
+      if(user){
         const dataConf = await OrdersModel.findOneAndUpdate(
           {
             _id,
@@ -1310,6 +1314,19 @@ class ContactController extends Controller {
             statusSignImage: user.signImage,
           }
         );
+      }
+      if(userPersonel){
+        const dataConf = await OrdersModel.findOneAndUpdate(
+          {
+            _id,
+          },
+          {
+            status: "true",
+            statusSignImage: userPersonel.signImage,
+          }
+        );
+      }
+       
 
         res.status(202).json({
           status: 202,

@@ -352,6 +352,15 @@ class UserController extends Controller {
                   requestDate: new Date().toLocaleDateString("fa-ir"),
                 });
               }
+              if (userPersonel.signRole == "3") {
+                return res.status(200).json({
+                  status: 200,
+                  thatsOp: true,
+                  thatsAnbar: true,
+                  message: "صاحب امضا و کد احراز شد",
+                  requestDate: new Date().toLocaleDateString("fa-ir"),
+                });
+              }
             } else {
               return res.status(404).json({
                 status: 404,

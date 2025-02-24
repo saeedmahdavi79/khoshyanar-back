@@ -184,6 +184,9 @@ class OfficeController extends Controller {
         const user = await UserModel.findOne({
           phone: verifyResult.phone,
         });
+        const userPersonel = await UserPersonelModel.findOne({
+          phone: verifyResult.phone,
+        });
 
         const getRandomInteger = (min, max) => {
           min = Math.ceil(min);
@@ -195,6 +198,15 @@ class OfficeController extends Controller {
         const signCode = getRandomInteger(10000, 99999);
 
         if (user) {
+          const createLeave = await UserPersonelModel.findOneAndUpdate(
+            { _id },
+            {
+              signImage,
+            }
+          );
+        }
+
+        if (userPersonel) {
           const createLeave = await UserPersonelModel.findOneAndUpdate(
             { _id },
             {

@@ -142,11 +142,13 @@ class SyncDataController extends Controller {
                     city:"",
                     lat:"35.7219",
                     lon:"51.3347",
+                    access:"7",
                     month: shamsi.gregorianToJalali(new Date())[1],
                                 year: shamsi.gregorianToJalali(new Date())[0],
                                 day: shamsi.gregorianToJalali(new Date())[2],
                     password: hashedPassword,
                     userName: userName,
+                    administrator: user._id,
                     adminUser: user._id,
                     adminUserName: user.name + " " + user.lastName,
                 };
@@ -201,8 +203,6 @@ async getProductsSync(req, res, next) {
           phone: verifyResult.phone,
       });
 
-console.log(tokenTakro);
-
         const fetchData = await fetch(baseUrl(`/services/Base/ApiService/GetGoodsInfo?FiscalYear=1403&MaxResultCount=1000000&StoreId=104`), {
           method: "GET",
           headers: {
@@ -214,8 +214,6 @@ console.log(tokenTakro);
 
       const responseData = await fetchData.json();
 
-
-      console.log(responseData);
       
 
       const promises = responseData.result.map(async (data) => {
