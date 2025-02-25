@@ -19,6 +19,8 @@ const HavaleAzAnbarSchema = new Schema({
   statusOpUserAdminSignImageAnbardar: { type: String, default: "-" },
   code: { type: String },
   reciver: { type: String },
+  reciverCode: { type: String },
+
   exitRes: { type: String },
   client: { type: String },
   representative: { type: String },

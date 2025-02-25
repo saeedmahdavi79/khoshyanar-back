@@ -16,6 +16,10 @@ const { baseUrl } = require("../../../utils/baseUrl");
 const { OrdersModel } = require("../../../models/contact/orders.model");
 const { NotifModel } = require("../../../models/notfication/notfication.model");
 const { BrokerModel } = require("../../../models/broker/broker.model");
+const { HavaleSellModel } = require("../../../models/contact/havaleSell.model");
+const {
+  HavaleAzAnbarModel,
+} = require("../../../models/production/product/havaleAzAnbar.model");
 
 //Public Class
 class ContactController extends Controller {
@@ -958,15 +962,13 @@ class ContactController extends Controller {
             adminName: userPersonelAddedOrder.name,
             title,
             des,
-
-            buyerName: !user
-              ? userPersonel.name + " " + userPersonel.lastName
-              : user.name + " " + user.lastName,
-            nationalCode: "-",
-            address: "-",
-            postalCode: "-",
-            phone: !user ? userPersonel.phone : user.phone,
-            buissCode: "-",
+            buyerCode: userPersonelAddedOrder.financialCode,
+            buyerName: userPersonelAddedOrder.name,
+            nationalCode: userPersonelAddedOrder.nationalCode,
+            address: userPersonelAddedOrder.address,
+            postalCode: userPersonelAddedOrder.postalCode,
+            phone: userPersonelAddedOrder.phone,
+            buissCode: userPersonelAddedOrder.buissCode,
 
             creatorName: !user
               ? userPersonel.name + " " + userPersonel.lastName
@@ -998,6 +1000,7 @@ class ContactController extends Controller {
             adminName: userPersonel.name + " " + userPersonel.lastName,
             title,
             des,
+            buyerCode: userPersonel.id,
             buyerName: userPersonel.name + " " + userPersonel.lastName,
             nationalCode: "-",
             address: "-",
@@ -1030,6 +1033,7 @@ class ContactController extends Controller {
           adminName: userCustomer.name,
           title,
           des,
+          buyerCode: userCustomer.financialCode,
           buyerName: userCustomer.name,
           nationalCode: userCustomer.nationalCode,
           address: userCustomer.address,
@@ -1304,29 +1308,28 @@ class ContactController extends Controller {
       });
 
       try {
-      if(user){
-        const dataConf = await OrdersModel.findOneAndUpdate(
-          {
-            _id,
-          },
-          {
-            status: "true",
-            statusSignImage: user.signImage,
-          }
-        );
-      }
-      if(userPersonel){
-        const dataConf = await OrdersModel.findOneAndUpdate(
-          {
-            _id,
-          },
-          {
-            status: "true",
-            statusSignImage: userPersonel.signImage,
-          }
-        );
-      }
-       
+        if (user) {
+          const dataConf = await OrdersModel.findOneAndUpdate(
+            {
+              _id,
+            },
+            {
+              status: "true",
+              statusSignImage: user.signImage,
+            }
+          );
+        }
+        if (userPersonel) {
+          const dataConf = await OrdersModel.findOneAndUpdate(
+            {
+              _id,
+            },
+            {
+              status: "true",
+              statusSignImage: userPersonel.signImage,
+            }
+          );
+        }
 
         res.status(202).json({
           status: 202,
@@ -1344,7 +1347,7 @@ class ContactController extends Controller {
 
   async orderOpConfirm(req, res, next) {
     try {
-      const { _id } = req.body;
+      const { _id, tokenTak } = req.body;
 
       const authorization = req.headers.authorization;
       const [bearer, token] = authorization.split(" ");
@@ -1355,6 +1358,10 @@ class ContactController extends Controller {
       });
 
       try {
+        const orderData = await OrdersModel.findOne({
+          _id,
+        });
+
         const dataConf = await OrdersModel.findOneAndUpdate(
           {
             _id,
@@ -1365,6 +1372,89 @@ class ContactController extends Controller {
             statusOpUserSignImage: userPersonel.signImage,
           }
         );
+
+        const getTimeSet = await fetch("https://api.keybit.ir/time/");
+        const getDataTime = await getTimeSet.json();
+
+        const fetchDataMande = await fetch(
+          baseUrl(`/services/Base/ApiService/CreatePreSale`),
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${tokenTak}`,
+              "Content-Type": "application/json",
+              "Abp.TenantId": "1",
+            },
+            body: JSON.stringify({
+              StoreId: 104,
+              FiscalYear: shamsi.gregorianToJalali(new Date())[0].toString(),
+              Price: orderData.products.reduce((accumulator, transaction) => {
+                return (
+                  accumulator +
+                  parseInt(!transaction.price ? 0 : transaction.price) *
+                    parseInt(transaction.count)
+                );
+              }, 0),
+              Amount: orderData.products.reduce((accumulator, transaction) => {
+                return (
+                  accumulator +
+                  parseInt(!transaction.price ? 0 : transaction.price) *
+                    parseInt(transaction.count) +
+                  ((accumulator +
+                    parseInt(!transaction.price ? 0 : transaction.price) *
+                      parseInt(transaction.count)) *
+                    10) /
+                    100
+                );
+              }, 0),
+              DocDate: getDataTime.date.full.official.usual.en,
+              TransferSerialNo: orderData.code,
+              SaleDtls: orderData.products.map((i) => ({
+                FiscalYear: shamsi.gregorianToJalali(new Date())[0].toString(),
+                GoodsID: i.code,
+                DocDate: getDataTime.date.full.official.usual.en,
+                Quantity: parseFloat(i.count),
+                GoodsPrice: parseFloat(i.price),
+              })),
+              Customer: {
+                Id: orderData.buyerCode,
+                FullName: orderData.buyerName,
+                Email: "-",
+                Phone: orderData.phone,
+                FirstName: orderData.buyerName,
+                LastName: "",
+                NationalID: orderData.nationalCode,
+                BirthDate: "",
+                AccountNumber: "",
+              },
+            }),
+          }
+        );
+
+        const responseDataMande = await fetchDataMande.json();
+
+        if (responseDataMande.success == true) {
+          const addHavaleh = await HavaleSellModel.create({
+            title: "حواله فروش",
+            orderId: orderData._id,
+            orderType: orderData.title,
+            adminId: orderData.adminId,
+            adminName: orderData.adminName,
+            products: orderData.products,
+            statusOp: "true",
+            statusOpUser: userPersonel.name + " " + userPersonel.lastName,
+            statusOpUserSignImage: userPersonel.signImage,
+            creatorName: orderData.creatorName,
+            buyerName: orderData.buyerName,
+            nationalCode: orderData.nationalCode,
+            address: orderData.address,
+            postalCode: orderData.postalCode,
+            phone: orderData.phone,
+            des: orderData.des,
+            buissCode: orderData.buissCode,
+            takroPish: responseDataMande.result.serialNo,
+          });
+        }
 
         res.status(202).json({
           status: 202,
@@ -1394,6 +1484,175 @@ class ContactController extends Controller {
 
       try {
         const dataConf = await OrdersModel.findOneAndUpdate(
+          {
+            _id,
+          },
+          {
+            statusOpAdmin: "true",
+            statusOpUserAdmin: userPersonel.name + " " + userPersonel.lastName,
+            statusOpUserAdminSignImage: userPersonel.signImage,
+          }
+        );
+
+        res.status(202).json({
+          status: 202,
+          message: "اطلاعات بروز شد",
+
+          createDate: new Date().toLocaleDateString("fa-ir"),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getHavale(req, res, next) {
+    try {
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+
+      const verifyResult = await verifyAccessToken(token);
+      const user = await UserModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      const userCustomer = await CustomersModel.findOne({
+        _id: verifyResult.userID,
+      });
+
+      let dataGet = [];
+
+      if (user) {
+        dataGet = (await HavaleSellModel.find()).reverse();
+      }
+
+      if (userPersonel) {
+        dataGet = (await HavaleSellModel.find()).reverse();
+      }
+
+      if (userCustomer) {
+        dataGet = (
+          await HavaleSellModel.find({
+            adminId: userCustomer._id,
+          })
+        ).reverse();
+      }
+      res.status(202).json({
+        status: 202,
+        message: "اطلاعات دریافت شد",
+        data: { dataGet },
+        createDate: new Date().toLocaleDateString("fa-ir"),
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        status: 500,
+        message: "اطلاعات بروز نشد",
+
+        createDate: new Date().toLocaleDateString("fa-ir"),
+      });
+    }
+  }
+
+  async orderAdminHavaleConfirm(req, res, next) {
+    try {
+      const { _id } = req.body;
+
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+      const verifyResult = await verifyAccessToken(token);
+
+      const user = await UserModel.findOne({
+        phone: verifyResult.phone,
+      });
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      const havaleData = await HavaleSellModel.findOne({
+        _id,
+      });
+
+      try {
+        if (user) {
+          const dataConf = await HavaleSellModel.findOneAndUpdate(
+            {
+              _id,
+            },
+            {
+              status: "true",
+              statusSignImage: user.signImage,
+            }
+          );
+
+          const addResid = await HavaleAzAnbarModel.create({
+            products: havaleData.products,
+            adminId: user._id,
+            adminName: user.name + " " + user.lastName,
+            reciver: havaleData.buyerName,
+            reciverCode: havaleData.buyerCode,
+            date: havaleData.createDate,
+            location: "-",
+            source: "-",
+            code: havaleData.takroPish,
+          });
+        }
+        if (userPersonel) {
+          const dataConf = await HavaleSellModel.findOneAndUpdate(
+            {
+              _id,
+            },
+            {
+              status: "true",
+              statusSignImage: userPersonel.signImage,
+            }
+          );
+
+          const addResid = await HavaleAzAnbarModel.create({
+            products: havaleData.products,
+            adminId: userPersonel._id,
+            adminName: userPersonel.name + " " + userPersonel.lastName,
+            reciver: havaleData.buyerName,
+            date: havaleData.createDate,
+            location: "-",
+            source: "-",
+            code: havaleData.code,
+          });
+        }
+
+        res.status(202).json({
+          status: 202,
+          message: "اطلاعات بروز شد",
+
+          createDate: new Date().toLocaleDateString("fa-ir"),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+  async orderOpManageHavaleConfirm(req, res, next) {
+    try {
+      const { _id } = req.body;
+
+      const authorization = req.headers.authorization;
+      const [bearer, token] = authorization.split(" ");
+      const verifyResult = await verifyAccessToken(token);
+
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
+
+      try {
+        const dataConf = await HavaleSellModel.findOneAndUpdate(
           {
             _id,
           },

@@ -17,6 +17,7 @@ const {
 const {
   CustomersModel,
 } = require("../../../../models/customers/customers.model");
+const { baseUrl } = require("../../../../utils/baseUrl");
 
 //Public Class
 class ProductController extends Controller {
@@ -281,7 +282,8 @@ class ProductController extends Controller {
           },
           {
             statusOpAdminAnbardar: "true",
-            statusOpUserAdminAnbardar: userPersonel.name + " " + userPersonel.lastName,
+            statusOpUserAdminAnbardar:
+              userPersonel.name + " " + userPersonel.lastName,
             statusOpUserAdminSignImageAnbardar: userPersonel.signImage,
           }
         );
@@ -573,28 +575,6 @@ class ProductController extends Controller {
       });
 
       if (user) {
-        const updatedProducts = [];
-
-        for (const { _id, newVal } of products) {
-          const product = await ProductModel.findById(_id);
-          if (product) {
-            product.exportCount =
-              (parseInt(product.exportCount) || 0) + parseInt(newVal);
-            product.mainCount =
-              (parseInt(product.mainCount) || 0) - parseInt(newVal);
-
-            await product.save();
-            updatedProducts.push(product);
-          } else {
-            res.status(404).json({
-              status: 404,
-              message: "محصول موجود نیست",
-
-              createDate: new Date().toLocaleDateString("fa-ir"),
-            });
-          }
-        }
-
         const addResid = await HavaleAzAnbarModel.create({
           products,
           adminId: user._id,
@@ -613,28 +593,6 @@ class ProductController extends Controller {
       }
 
       if (userPersonel) {
-        const updatedProducts = [];
-
-        for (const { _id, newVal } of products) {
-          const product = await ProductModel.findById(_id);
-          if (product) {
-            product.exportCount =
-              (parseInt(product.exportCount) || 0) + parseInt(newVal);
-            product.mainCount =
-              (parseInt(product.mainCount) || 0) - parseInt(newVal);
-
-            await product.save();
-            updatedProducts.push(product);
-          } else {
-            res.status(404).json({
-              status: 404,
-              message: "محصول موجود نیست",
-
-              createDate: new Date().toLocaleDateString("fa-ir"),
-            });
-          }
-        }
-
         const addResid = await HavaleAzAnbarModel.create({
           products,
           adminId: userPersonel._id,
@@ -726,19 +684,15 @@ class ProductController extends Controller {
         let dataGet = [];
 
         if (user) {
-          dataGet = (await HavaleAzAnbarModel.find({
-            
-          })).reverse();
+          dataGet = (await HavaleAzAnbarModel.find({})).reverse();
         }
 
         if (userPersonel) {
-          if(userPersonel.access == "1" || userPersonel.access == "2"){
-            dataGet = (await HavaleAzAnbarModel.find({
-            })).reverse();
-          }else{
+          if (userPersonel.access == "1" || userPersonel.access == "2") {
+            dataGet = (await HavaleAzAnbarModel.find({})).reverse();
+          } else {
             dataGet = (await HavaleAzAnbarModel.find()).reverse();
           }
-         
         }
 
         res.status(202).json({
@@ -759,12 +713,11 @@ class ProductController extends Controller {
     try {
       const { _id } = req.body;
       try {
-      
         const authorization = req.headers.authorization;
         const [bearer, token] = authorization.split(" ");
-    
+
         const verifyResult = await verifyAccessToken(token);
-    
+
         const user = await UserModel.findOne({
           phone: verifyResult.phone,
         });
@@ -772,7 +725,7 @@ class ProductController extends Controller {
           phone: verifyResult.phone,
         });
 
-        if(user){
+        if (user) {
           const dataConf = await HavaleAzAnbarModel.findOneAndUpdate(
             {
               _id,
@@ -783,19 +736,117 @@ class ProductController extends Controller {
             }
           );
         }
-        if(userPersonel){
-          const dataConf = await HavaleAzAnbarModel.findOneAndUpdate(
+
+        res.status(202).json({
+          status: 202,
+          message: "اطلاعات بروز شد",
+
+          createDate: new Date().toLocaleDateString("fa-ir"),
+        });
+      } catch (error) {
+        next(error);
+      }
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async decraseMojodiAnbarConfirm(req, res, next) {
+    try {
+      const { _id, tokenTak } = req.body;
+      try {
+        const authorization = req.headers.authorization;
+        const [bearer, token] = authorization.split(" ");
+
+        const verifyResult = await verifyAccessToken(token);
+
+        const user = await UserModel.findOne({
+          phone: verifyResult.phone,
+        });
+        const userPersonel = await UserPersonelModel.findOne({
+          phone: verifyResult.phone,
+        });
+        const products = await HavaleAzAnbarModel.findOne({
+          _id,
+        });
+
+        if (userPersonel) {
+          const getTimeSet = await fetch("https://api.keybit.ir/time/");
+          const getDataTime = await getTimeSet.json();
+
+          const fetchDataMande = await fetch(
+            baseUrl(`/services/Base/ApiService/CreateSale`),
             {
-              _id,
-            },
-            {
-              status: "true",
-              statusSignImage: userPersonel.signImage,
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${tokenTak}`,
+                "Content-Type": "application/json",
+                "Abp.TenantId": "1",
+              },
+              body: JSON.stringify({
+                StoreId: 104,
+                FiscalYear: shamsi.gregorianToJalali(new Date())[0].toString(),
+                Price: products.products.reduce((accumulator, transaction) => {
+                  return (
+                    accumulator +
+                    parseInt(!transaction.price ? 0 : transaction.price) *
+                      parseInt(transaction.count)
+                  );
+                }, 0),
+                Amount: products.products.reduce((accumulator, transaction) => {
+                  return (
+                    accumulator +
+                    parseInt(!transaction.price ? 0 : transaction.price) *
+                      parseInt(transaction.count) +
+                    ((accumulator +
+                      parseInt(!transaction.price ? 0 : transaction.price) *
+                        parseInt(transaction.count)) *
+                      10) /
+                      100
+                  );
+                }, 0),
+                DocDate: getDataTime.date.full.official.usual.en,
+                TransferSerialNo: products.code,
+                SaleDtls: products.products.map((i) => ({
+                  FiscalYear: shamsi
+                    .gregorianToJalali(new Date())[0]
+                    .toString(),
+                  GoodsID: i.code,
+                  DocDate: getDataTime.date.full.official.usual.en,
+                  Quantity: parseFloat(i.count),
+                  GoodsPrice: parseFloat(i.price),
+                })),
+                Customer: {
+                  Id: products.buyerCode,
+                  FullName: products.buyerName,
+                  Email: "-",
+                  Phone: products.phone,
+                  FirstName: products.buyerName,
+                  LastName: "",
+                  NationalID: products.nationalCode,
+                  BirthDate: "",
+                  AccountNumber: "",
+                },
+              }),
             }
           );
+
+          const responseDataMande = await fetchDataMande.json();
+
+          console.log(responseDataMande);
+
+          if (responseDataMande.success == true) {
+            const dataConf = await HavaleAzAnbarModel.findOneAndUpdate(
+              {
+                _id,
+              },
+              {
+                statusOpUserAdminAnbardar: "true",
+                statusOpUserAdminSignImageAnbardar: userPersonel.signImage,
+              }
+            );
+          }
         }
-       
-       
 
         res.status(202).json({
           status: 202,

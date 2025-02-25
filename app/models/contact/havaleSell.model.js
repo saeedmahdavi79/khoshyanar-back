@@ -1,8 +1,11 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const OrdersDataSchema = new Schema({
+const HavaleSellSchema = new Schema({
   title: { type: String },
+  orderId: { type: String },
+  orderType: { type: String },
+  takroPish: { type: String },
   adminId: { type: String },
   adminName: { type: String },
   products: { type: JSON },
@@ -17,6 +20,7 @@ const OrdersDataSchema = new Schema({
   creatorName: { type: String },
   buyerName: { type: String },
   buyerCode: { type: String },
+
   nationalCode: { type: String },
   address: { type: String },
   postalCode: { type: String },
@@ -29,5 +33,5 @@ const OrdersDataSchema = new Schema({
   createDate: { type: String, default: new Date().toLocaleDateString("fa-IR") },
 });
 
-const OrdersModel = mongoose.model("OrdersDataSchema", OrdersDataSchema);
-module.exports = { OrdersModel };
+const HavaleSellModel = mongoose.model("HavaleSellSchema", HavaleSellSchema);
+module.exports = { HavaleSellModel };

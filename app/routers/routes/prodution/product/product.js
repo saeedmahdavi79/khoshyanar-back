@@ -460,17 +460,13 @@ router.post(
 );
 
 router.post(
-  "/sarparast-confirm",
-  ProductController.orderOpConfirm
+  "/anbar-havale-confirm",
+  ProductController.decraseMojodiAnbarConfirm
 );
-router.post(
-  "/manage-confirm",
-  ProductController.orderOpManageConfirm
-);
-router.post(
-  "/anbar-confirm",
-  ProductController.orderOpManageConfirmAnbardar
-);
+
+router.post("/sarparast-confirm", ProductController.orderOpConfirm);
+router.post("/manage-confirm", ProductController.orderOpManageConfirm);
+router.post("/anbar-confirm", ProductController.orderOpManageConfirmAnbardar);
 
 router.post("/get-by-month", ProductReportController.getCategoryByMonth);
 router.post("/get-by-year", ProductReportController.getCategoryByYear);

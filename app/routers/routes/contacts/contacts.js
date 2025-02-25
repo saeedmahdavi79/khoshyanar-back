@@ -423,6 +423,17 @@ router.post(
   ContactController.orderOpManageConfirm
 );
 
+router.post(
+  "/confirm-havale-operator-manage",
+  bearerToken,
+  ContactController.orderOpManageHavaleConfirm
+);
+router.post(
+  "/confirm-havale-manage",
+  bearerToken,
+  ContactController.orderAdminHavaleConfirm
+);
+
 router.post("/get-gardesh", bearerToken, ContactController.getGhardesh);
 router.post("/get-mande", bearerToken, ContactController.getMandeh);
 
@@ -454,6 +465,7 @@ router.get(
 );
 router.get("/getAll", ContactController.getAllContacts);
 router.get("/get-orders", ContactController.getOrder);
+router.get("/get-havale-sell", ContactController.getHavale);
 
 router.get(
   "/get-visitor-data",
