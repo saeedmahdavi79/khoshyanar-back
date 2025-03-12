@@ -776,6 +776,15 @@ class ProductController extends Controller {
 
           console.log(products);
 
+          const getRandomInteger = (min, max) => {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+
+            return Math.floor(Math.random() * (max - min)) + min;
+          };
+
+          const SerialCode = getRandomInteger(1000, 9999);
+
           const fetchDataMande = await fetch(
             baseUrl(`/services/Base/ApiService/CreateSale`),
             {
@@ -822,7 +831,7 @@ class ProductController extends Controller {
                 }, 0),
                 DocDate: getDataTime.date.full.official.usual.en,
                 ProcessID: "1",
-                TransferSerialNo: products.code,
+                TransferSerialNo: SerialCode.toString(),
                 SaleDtls: products.products.map((i) => ({
                   FiscalYear: shamsi
                     .gregorianToJalali(new Date())[0]
@@ -858,7 +867,9 @@ class ProductController extends Controller {
                 _id,
               },
               {
-                statusOpUserAdminAnbardar: "true",
+                statusOpAdminAnbardar: "true",
+                statusOpUserAdminAnbardar:
+                  userPersonel.name + " " + userPersonel.lastName,
                 statusOpUserAdminSignImageAnbardar: userPersonel.signImage,
               }
             );
@@ -984,7 +995,7 @@ class ProductController extends Controller {
         },
         {
           exitRes,
-          reciver,
+          reciver2: reciver,
           location,
           carNumber: carNum,
         }

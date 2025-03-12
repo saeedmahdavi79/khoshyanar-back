@@ -20,7 +20,8 @@ const HavaleAzAnbarSchema = new Schema({
   code: { type: String },
   reciver: { type: String },
   reciverCode: { type: String },
-
+  reciver2: { type: String },
+  reciverCode2: { type: String },
   exitRes: { type: String },
   client: { type: String },
   representative: { type: String },
