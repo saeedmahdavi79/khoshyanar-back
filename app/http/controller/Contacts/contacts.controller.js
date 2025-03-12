@@ -1266,17 +1266,35 @@ class ContactController extends Controller {
       const user = await UserModel.findOne({
         phone: verifyResult.phone,
       });
+      const userPersonel = await UserPersonelModel.findOne({
+        phone: verifyResult.phone,
+      });
 
       try {
-        const dataConf = await BrokerModel.findOneAndUpdate(
-          {
-            _id,
-          },
-          {
-            status: "true",
-            statusSignImage: user.signImage,
-          }
-        );
+        if(user){
+          const dataConf = await BrokerModel.findOneAndUpdate(
+            {
+              _id,
+            },
+            {
+              status: "true",
+              statusSignImage: user.signImage,
+            }
+          );
+          
+        }
+        if(userPersonel){
+          const dataConf = await BrokerModel.findOneAndUpdate(
+            {
+              _id,
+            },
+            {
+              status: "true",
+              statusSignImage: userPersonel.signImage,
+            }
+          );
+        }
+       
 
         res.status(202).json({
           status: 202,
@@ -1388,6 +1406,17 @@ class ContactController extends Controller {
             body: JSON.stringify({
               StoreId: 104,
               FiscalYear: shamsi.gregorianToJalali(new Date())[0].toString(),
+             
+              TollOverWorthCost:orderData.products.reduce((accumulator, transaction) => {
+                return (
+                  
+                  ((accumulator +
+                    parseInt(!transaction.price ? 0 : transaction.price) *
+                      parseInt(transaction.count)) *
+                    10) /
+                    100
+                );
+              }, 0),
               Price: orderData.products.reduce((accumulator, transaction) => {
                 return (
                   accumulator +
@@ -1417,7 +1446,7 @@ class ContactController extends Controller {
                 GoodsPrice: parseFloat(i.price),
               })),
               Customer: {
-                Id: orderData.buyerCode,
+                //Id: orderData.buyerCode,
                 FullName: orderData.buyerName,
                 Email: "-",
                 Phone: orderData.phone,
@@ -1426,6 +1455,7 @@ class ContactController extends Controller {
                 NationalID: orderData.nationalCode,
                 BirthDate: "",
                 AccountNumber: "",
+                AcntCode:"11301"+" "+orderData.buyerCode
               },
             }),
           }
