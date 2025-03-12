@@ -486,6 +486,7 @@ router.put("/edit", ProductController.editProduct);
 router.put("/incrase", ProductController.incraseMojodi);
 router.put("/incrase-batch", ProductController.incraseMojodiList);
 router.put("/decrase-batch", ProductController.decraseMojodiList);
+router.put("/edit-order", ProductController.editHavaleOrder);
 
 router.put("/decrase", ProductController.decraseMojodi);
 

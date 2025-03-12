@@ -1271,7 +1271,7 @@ class ContactController extends Controller {
       });
 
       try {
-        if(user){
+        if (user) {
           const dataConf = await BrokerModel.findOneAndUpdate(
             {
               _id,
@@ -1281,9 +1281,8 @@ class ContactController extends Controller {
               statusSignImage: user.signImage,
             }
           );
-          
         }
-        if(userPersonel){
+        if (userPersonel) {
           const dataConf = await BrokerModel.findOneAndUpdate(
             {
               _id,
@@ -1294,7 +1293,6 @@ class ContactController extends Controller {
             }
           );
         }
-       
 
         res.status(202).json({
           status: 202,
@@ -1406,17 +1404,19 @@ class ContactController extends Controller {
             body: JSON.stringify({
               StoreId: 104,
               FiscalYear: shamsi.gregorianToJalali(new Date())[0].toString(),
-             
-              TollOverWorthCost:orderData.products.reduce((accumulator, transaction) => {
-                return (
-                  
-                  ((accumulator +
-                    parseInt(!transaction.price ? 0 : transaction.price) *
-                      parseInt(transaction.count)) *
-                    10) /
+
+              TollOverWorthCost: orderData.products.reduce(
+                (accumulator, transaction) => {
+                  return (
+                    ((accumulator +
+                      parseInt(!transaction.price ? 0 : transaction.price) *
+                        parseInt(transaction.count)) *
+                      10) /
                     100
-                );
-              }, 0),
+                  );
+                },
+                0
+              ),
               Price: orderData.products.reduce((accumulator, transaction) => {
                 return (
                   accumulator +
@@ -1455,7 +1455,7 @@ class ContactController extends Controller {
                 NationalID: orderData.nationalCode,
                 BirthDate: "",
                 AccountNumber: "",
-                AcntCode:"11301"+" "+orderData.buyerCode
+                AcntCode: "11301" + " " + orderData.buyerCode,
               },
             }),
           }
@@ -1476,6 +1476,7 @@ class ContactController extends Controller {
             statusOpUserSignImage: userPersonel.signImage,
             creatorName: orderData.creatorName,
             buyerName: orderData.buyerName,
+            buyerCode: orderData.buyerCode,
             nationalCode: orderData.nationalCode,
             address: orderData.address,
             postalCode: orderData.postalCode,

@@ -774,6 +774,8 @@ class ProductController extends Controller {
           const getTimeSet = await fetch("https://api.keybit.ir/time/");
           const getDataTime = await getTimeSet.json();
 
+          console.log(products);
+
           const fetchDataMande = await fetch(
             baseUrl(`/services/Base/ApiService/CreateSale`),
             {
@@ -786,6 +788,19 @@ class ProductController extends Controller {
               body: JSON.stringify({
                 StoreId: 104,
                 FiscalYear: shamsi.gregorianToJalali(new Date())[0].toString(),
+
+                // TollOverWorthCost: products.products.reduce(
+                //   (accumulator, transaction) => {
+                //     return (
+                //       ((accumulator +
+                //         parseInt(!transaction.price ? 0 : transaction.price) *
+                //           parseInt(transaction.count)) *
+                //         10) /
+                //       100
+                //     );
+                //   },
+                //   0
+                // ),
                 Price: products.products.reduce((accumulator, transaction) => {
                   return (
                     accumulator +
@@ -806,6 +821,7 @@ class ProductController extends Controller {
                   );
                 }, 0),
                 DocDate: getDataTime.date.full.official.usual.en,
+                ProcessID: "1",
                 TransferSerialNo: products.code,
                 SaleDtls: products.products.map((i) => ({
                   FiscalYear: shamsi
@@ -817,7 +833,8 @@ class ProductController extends Controller {
                   GoodsPrice: parseFloat(i.price),
                 })),
                 Customer: {
-                  Id: products.buyerCode,
+                  //Id: "11301" + " " + products.buyerCode,
+                  AcntCode: "11301" + " " + products.reciverCode,
                   FullName: products.buyerName,
                   Email: "-",
                   Phone: products.phone,
@@ -845,15 +862,21 @@ class ProductController extends Controller {
                 statusOpUserAdminSignImageAnbardar: userPersonel.signImage,
               }
             );
+            res.status(202).json({
+              status: 202,
+              message: "اطلاعات بروز شد",
+
+              createDate: new Date().toLocaleDateString("fa-ir"),
+            });
+          } else {
+            res.status(400).json({
+              status: 400,
+              err: responseDataMande.error.message,
+              message: "اطلاعات بروز نشد",
+              createDate: new Date().toLocaleDateString("fa-ir"),
+            });
           }
         }
-
-        res.status(202).json({
-          status: 202,
-          message: "اطلاعات بروز شد",
-
-          createDate: new Date().toLocaleDateString("fa-ir"),
-        });
       } catch (error) {
         next(error);
       }
@@ -949,6 +972,33 @@ class ProductController extends Controller {
       });
     }
     return dataGet;
+  }
+
+  async editHavaleOrder(req, res, next) {
+    try {
+      const { _id, reciver, exitRes, location, carNum } = req.body;
+
+      const dataConf = await HavaleAzAnbarModel.findOneAndUpdate(
+        {
+          _id,
+        },
+        {
+          exitRes,
+          reciver,
+          location,
+          carNumber: carNum,
+        }
+      );
+
+      res.status(202).json({
+        status: 202,
+        message: "اطلاعات بروز شد",
+
+        createDate: new Date().toLocaleDateString("fa-ir"),
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
   async addChildToParent(req, res, next) {
