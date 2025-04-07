@@ -20,7 +20,7 @@ const HavaleSellSchema = new Schema({
   creatorName: { type: String },
   buyerName: { type: String },
   buyerCode: { type: String },
-
+  tax: { type: String },
   nationalCode: { type: String },
   address: { type: String },
   postalCode: { type: String },

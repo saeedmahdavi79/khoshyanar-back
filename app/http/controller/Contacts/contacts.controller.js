@@ -891,7 +891,8 @@ class ContactController extends Controller {
   }
 
   async addOrder(req, res, next) {
-    const { products, title, id, des } = req.body; // products باید یک آرایه از اشیاء باشد
+    const { products, title, id, des, tax } = req.body; // products باید یک آرایه از اشیاء باشد
+    console.log(tax);
     try {
       const authorization = req.headers.authorization;
       const [bearer, token] = authorization.split(" ");
@@ -932,7 +933,7 @@ class ContactController extends Controller {
           postalCode: "-",
           phone: user.phone,
           buissCode: "-",
-
+          tax,
           code: randId,
           month: shamsi.gregorianToJalali(new Date())[1],
           year: shamsi.gregorianToJalali(new Date())[0],
@@ -969,7 +970,7 @@ class ContactController extends Controller {
             postalCode: userPersonelAddedOrder.postalCode,
             phone: userPersonelAddedOrder.phone,
             buissCode: userPersonelAddedOrder.buissCode,
-
+            tax,
             creatorName: !user
               ? userPersonel.name + " " + userPersonel.lastName
               : user.name + " " + user.lastName,
@@ -1007,6 +1008,7 @@ class ContactController extends Controller {
             postalCode: "-",
             phone: userPersonel.phone,
             buissCode: "-",
+            tax,
             code: randId,
             month: shamsi.gregorianToJalali(new Date())[1],
             year: shamsi.gregorianToJalali(new Date())[0],
@@ -1041,6 +1043,7 @@ class ContactController extends Controller {
           phone: userCustomer.phone,
           buissCode: userCustomer.buissCode,
           code: randId,
+          tax,
           month: shamsi.gregorianToJalali(new Date())[1],
           year: shamsi.gregorianToJalali(new Date())[0],
         });
@@ -1405,7 +1408,8 @@ class ContactController extends Controller {
               StoreId: 104,
               FiscalYear: shamsi.gregorianToJalali(new Date())[0].toString(),
 
-              TollOverWorthCost: orderData.products.reduce(
+              TollOverWorthCost: 0,
+              TaxOverWorthCost: orderData.products.reduce(
                 (accumulator, transaction) => {
                   return (
                     ((accumulator +
@@ -1482,6 +1486,7 @@ class ContactController extends Controller {
             postalCode: orderData.postalCode,
             phone: orderData.phone,
             des: orderData.des,
+            tax: orderData.tax,
             buissCode: orderData.buissCode,
             takroPish: responseDataMande.result.serialNo,
           });

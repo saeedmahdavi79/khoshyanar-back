@@ -22,6 +22,7 @@ const OrdersDataSchema = new Schema({
   postalCode: { type: String },
   phone: { type: String },
   buissCode: { type: String },
+  tax: { type: String },
   des: { type: String },
   code: { type: String },
   month: { type: String },
