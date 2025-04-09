@@ -1433,13 +1433,13 @@ class ContactController extends Controller {
               Amount: orderData.products.reduce((accumulator, transaction) => {
                 return (
                   accumulator +
-                  parseInt(!transaction.price ? 0 : transaction.price) *
-                    parseInt(transaction.count) +
-                  ((accumulator +
-                    parseInt(!transaction.price ? 0 : transaction.price) *
-                      parseInt(transaction.count)) *
-                    10) /
-                    100
+                  parseFloat(!transaction.price ? 0 : transaction.price) *
+                    parseFloat(transaction.count) +
+                  (accumulator +
+                    (parseFloat(!transaction.price ? 0 : transaction.price) *
+                      parseFloat(transaction.count) *
+                      10) /
+                      100)
                 );
               }, 0),
               DocDate: getDataTime.date.full.official.usual.en,
