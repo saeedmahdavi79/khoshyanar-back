@@ -1409,18 +1409,18 @@ class ContactController extends Controller {
               FiscalYear: shamsi.gregorianToJalali(new Date())[0].toString(),
 
               TollOverWorthCost: 0,
-              TaxOverWorthCost: orderData.products.reduce(
-                (accumulator, transaction) => {
-                  return (
-                    ((accumulator +
-                      parseInt(!transaction.price ? 0 : transaction.price) *
-                        parseInt(transaction.count)) *
-                      10) /
-                    100
-                  );
-                },
-                0
-              ),
+              TaxOverWorthCost:
+                orderData.tax == "1"
+                  ? orderData.products.reduce((accumulator, transaction) => {
+                      return (
+                        ((accumulator +
+                          parseInt(!transaction.price ? 0 : transaction.price) *
+                            parseInt(transaction.count)) *
+                          10) /
+                        100
+                      );
+                    }, 0)
+                  : 0,
               Price: orderData.products.reduce((accumulator, transaction) => {
                 return (
                   accumulator +
