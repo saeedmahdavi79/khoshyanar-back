@@ -1413,19 +1413,21 @@ class ContactController extends Controller {
                 orderData.tax == "1"
                   ? orderData.products.reduce((accumulator, transaction) => {
                       return (
-                        ((accumulator +
-                          parseInt(!transaction.price ? 0 : transaction.price) *
-                            parseInt(transaction.count)) *
+                        accumulator +
+                        (parseFloat(
+                          !transaction.price ? 0 : transaction.price
+                        ) *
+                          parseFloat(transaction.count) *
                           10) /
-                        100
+                          100
                       );
                     }, 0)
                   : 0,
               Price: orderData.products.reduce((accumulator, transaction) => {
                 return (
                   accumulator +
-                  parseInt(!transaction.price ? 0 : transaction.price) *
-                    parseInt(transaction.count)
+                  parseFloat(!transaction.price ? 0 : transaction.price) *
+                    parseFloat(transaction.count)
                 );
               }, 0),
               Amount: orderData.products.reduce((accumulator, transaction) => {
