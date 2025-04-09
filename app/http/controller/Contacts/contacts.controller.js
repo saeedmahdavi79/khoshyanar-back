@@ -1448,6 +1448,8 @@ class ContactController extends Controller {
                 DocDate: getDataTime.date.full.official.usual.en,
                 Quantity: parseFloat(i.count),
                 GoodsPrice: parseFloat(i.price),
+                TaxOverWorthCost:
+                  (parseFloat(i.count) * parseFloat(i.price) * 10) / 100,
               })),
               Customer: {
                 //Id: orderData.buyerCode,
