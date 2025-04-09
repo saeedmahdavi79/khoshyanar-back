@@ -1449,7 +1449,9 @@ class ContactController extends Controller {
                 Quantity: parseFloat(i.count),
                 GoodsPrice: parseFloat(i.price),
                 TaxOverWorthCost:
-                  (parseFloat(i.count) * parseFloat(i.price) * 10) / 100,
+                  orderData.tax == "1"
+                    ? (parseFloat(i.count) * parseFloat(i.price) * 10) / 100
+                    : 0,
               })),
               Customer: {
                 //Id: orderData.buyerCode,
