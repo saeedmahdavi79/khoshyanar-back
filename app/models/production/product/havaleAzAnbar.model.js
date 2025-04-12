@@ -30,6 +30,11 @@ const HavaleAzAnbarSchema = new Schema({
   location: { type: String },
   source: { type: String },
   sourceName: { type: String },
+  buyerName: { type: String },
+  buyerCode: { type: String },
+  tax: { type: String },
+  nationalCode: { type: String },
+  takroPish: { type: String },
   createDate: {
     type: String,
     default: new Date().toLocaleDateString("fa-ir"),

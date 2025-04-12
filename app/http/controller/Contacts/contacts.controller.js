@@ -1640,6 +1640,7 @@ class ContactController extends Controller {
             reciver: havaleData.buyerName,
             reciverCode: havaleData.buyerCode,
             date: havaleData.createDate,
+            tax: havaleData.tax,
             location: "-",
             source: "-",
             code: havaleData.takroPish,

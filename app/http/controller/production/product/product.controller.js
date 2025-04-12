@@ -797,7 +797,21 @@ class ProductController extends Controller {
               body: JSON.stringify({
                 StoreId: 104,
                 FiscalYear: shamsi.gregorianToJalali(new Date())[0].toString(),
-
+                TollOverWorthCost: 0,
+                TaxOverWorthCost:
+                  orderData.tax == "1"
+                    ? products.products.reduce((accumulator, transaction) => {
+                        return (
+                          accumulator +
+                          (parseFloat(
+                            !transaction.price ? 0 : transaction.price
+                          ) *
+                            parseFloat(transaction.count) *
+                            10) /
+                            100
+                        );
+                      }, 0)
+                    : 0,
                 // TollOverWorthCost: products.products.reduce(
                 //   (accumulator, transaction) => {
                 //     return (
@@ -813,20 +827,20 @@ class ProductController extends Controller {
                 Price: products.products.reduce((accumulator, transaction) => {
                   return (
                     accumulator +
-                    parseInt(!transaction.price ? 0 : transaction.price) *
-                      parseInt(transaction.count)
+                    parseFloat(!transaction.price ? 0 : transaction.price) *
+                      parseFloat(transaction.count)
                   );
                 }, 0),
                 Amount: products.products.reduce((accumulator, transaction) => {
                   return (
                     accumulator +
-                    parseInt(!transaction.price ? 0 : transaction.price) *
-                      parseInt(transaction.count) +
-                    ((accumulator +
-                      parseInt(!transaction.price ? 0 : transaction.price) *
-                        parseInt(transaction.count)) *
-                      10) /
-                      100
+                    parseFloat(!transaction.price ? 0 : transaction.price) *
+                      parseFloat(transaction.count) +
+                    (accumulator +
+                      (parseFloat(!transaction.price ? 0 : transaction.price) *
+                        parseFloat(transaction.count) *
+                        10) /
+                        100)
                   );
                 }, 0),
                 DocDate: getDataTime.date.full.official.usual.en,
@@ -840,15 +854,20 @@ class ProductController extends Controller {
                   DocDate: getDataTime.date.full.official.usual.en,
                   Quantity: parseFloat(i.count),
                   GoodsPrice: parseFloat(i.price),
+                  TaxOverWorthCost:
+                    products.tax == "1"
+                      ? (parseFloat(i.count) * parseFloat(i.price) * 10) / 100
+                      : 0,
                 })),
                 Customer: {
                   //Id: "11301" + " " + products.buyerCode,
                   AcntCode: "11301" + " " + products.reciverCode,
-                  FullName: products.buyerName,
+                  FullName: products.reciver,
                   Email: "-",
                   Phone: products.phone,
                   FirstName: products.buyerName,
                   LastName: "",
+
                   NationalID: products.nationalCode,
                   BirthDate: "",
                   AccountNumber: "",
@@ -858,8 +877,6 @@ class ProductController extends Controller {
           );
 
           const responseDataMande = await fetchDataMande.json();
-
-          console.log(responseDataMande);
 
           if (responseDataMande.success == true) {
             const dataConf = await HavaleAzAnbarModel.findOneAndUpdate(
